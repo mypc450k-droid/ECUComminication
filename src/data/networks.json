@@ -1,0 +1,47 @@
+[
+  {
+    "id": "can-hs",
+    "name": "CAN High Speed",
+    "type": "CAN_HS",
+    "baudRate": "500 kbps",
+    "description": "Primary vehicle CAN bus for powertrain, chassis, and safety-critical communication.",
+    "color": "#00D4FF",
+    "ecuIds": ["bcm", "gateway", "engine", "transmission", "bms", "abs", "esp", "airbag", "cluster", "adas", "steering", "lighting", "hvac", "charging", "motor-controller", "inverter", "epb", "radar", "ultrasonic"]
+  },
+  {
+    "id": "can-ls",
+    "name": "CAN Low Speed",
+    "type": "CAN_LS",
+    "baudRate": "125 kbps",
+    "description": "Comfort and body CAN bus for non-critical functions with lower bandwidth requirements.",
+    "color": "#4A9EFF",
+    "ecuIds": ["bcm", "gateway", "seat", "sunroof"]
+  },
+  {
+    "id": "lin",
+    "name": "LIN Bus",
+    "type": "LIN",
+    "baudRate": "19.2 kbps",
+    "description": "Local Interconnect Network for door modules, sensors, and simple actuator control.",
+    "color": "#7B68EE",
+    "ecuIds": ["bcm", "door-fl", "door-fr", "door-rl", "door-rr", "pw-fl", "seat", "lighting", "hvac", "ultrasonic", "sunroof"]
+  },
+  {
+    "id": "ethernet",
+    "name": "Automotive Ethernet",
+    "type": "Ethernet",
+    "baudRate": "100 Mbps",
+    "description": "High-bandwidth backbone for ADAS, infotainment, and diagnostics (100BASE-T1).",
+    "color": "#00FF88",
+    "ecuIds": ["gateway", "adas", "radar", "camera", "cluster", "infotainment", "telematics", "bms", "charging", "motor-controller"]
+  },
+  {
+    "id": "flexray",
+    "name": "FlexRay",
+    "type": "FlexRay",
+    "baudRate": "10 Mbps",
+    "description": "Deterministic high-speed bus for chassis and powertrain safety-critical systems.",
+    "color": "#FF6B35",
+    "ecuIds": ["abs", "esp", "steering", "airbag"]
+  }
+]

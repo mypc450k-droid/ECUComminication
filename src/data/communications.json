@@ -1,0 +1,22 @@
+{
+  "communicationPool": [
+    { "network": "CAN_HS", "canId": "0x245", "source": "BCM", "signal": "Power Window Command", "destination": "Door ECU FL", "status": "success" },
+    { "network": "CAN_HS", "canId": "0x0C0", "source": "Engine ECU", "signal": "Engine Speed", "destination": "Cluster", "status": "success" },
+    { "network": "CAN_HS", "canId": "0x180", "source": "ADAS ECU", "signal": "ACC Target Speed", "destination": "ESP ECU", "status": "success" },
+    { "network": "LIN", "canId": "0x3A", "source": "Door ECU FL", "signal": "Window Position", "destination": "BCM", "status": "success" },
+    { "network": "Ethernet", "canId": "0x8001", "source": "Radar", "signal": "Object List", "destination": "ADAS ECU", "status": "success" },
+    { "network": "CAN_HS", "canId": "0x310", "source": "BCM", "signal": "Central Lock Command", "destination": "Gateway", "status": "success" },
+    { "network": "CAN_HS", "canId": "0x420", "source": "BCM", "signal": "Headlamp Command", "destination": "Lighting ECU", "status": "success" },
+    { "network": "CAN_HS", "canId": "0x330", "source": "HVAC", "signal": "Cabin Temperature", "destination": "BCM", "status": "success" },
+    { "network": "CAN_HS", "canId": "0x150", "source": "BMS", "signal": "State of Charge", "destination": "Cluster", "status": "success" },
+    { "network": "CAN_HS", "canId": "0x0A0", "source": "ABS ECU", "signal": "ABS Active", "destination": "ESP ECU", "status": "success" },
+    { "network": "CAN_HS", "canId": "0x070", "source": "Steering ECU", "signal": "Steering Torque", "destination": "ADAS ECU", "status": "success" },
+    { "network": "LIN", "canId": "0x2B", "source": "BCM", "signal": "LIN Schedule Frame", "destination": "Door ECU FR", "status": "success" },
+    { "network": "Ethernet", "canId": "0x8002", "source": "Camera", "signal": "Lane Model", "destination": "ADAS ECU", "status": "success" },
+    { "network": "CAN_HS", "canId": "0x250", "source": "Charging ECU", "signal": "Charging Status", "destination": "BMS", "status": "success" },
+    { "network": "CAN_HS", "canId": "0x090", "source": "Airbag ECU", "signal": "Crash Signal", "destination": "Gateway", "status": "success" },
+    { "network": "CAN_HS", "canId": "0x0E0", "source": "EPB", "signal": "EPB Status", "destination": "Cluster", "status": "success" },
+    { "network": "FlexRay", "canId": "0x010", "source": "ESP ECU", "signal": "Yaw Rate", "destination": "ABS ECU", "status": "success" },
+    { "network": "CAN_LS", "canId": "0x360", "source": "Seat ECU", "signal": "Seat Heater Status", "destination": "HVAC", "status": "success" }
+  ]
+}

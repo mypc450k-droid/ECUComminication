@@ -1,0 +1,102 @@
+[
+  {
+    "id": "vehicle",
+    "label": "Vehicle",
+    "type": "category",
+    "children": [
+      {
+        "id": "body",
+        "label": "Body",
+        "type": "domain",
+        "domain": "body",
+        "children": [
+          { "id": "feature-power-window", "label": "Power Window", "type": "feature", "featureId": "power-window" },
+          { "id": "feature-headlamp", "label": "Headlamp", "type": "feature", "featureId": "headlamp" },
+          { "id": "feature-tail-lamp", "label": "Tail Lamp", "type": "feature", "featureId": "tail-lamp" },
+          { "id": "feature-turn-indicator", "label": "Turn Indicator", "type": "feature", "featureId": "turn-indicator" },
+          { "id": "feature-hazard-lamp", "label": "Hazard Lamp", "type": "feature", "featureId": "hazard-lamp" },
+          { "id": "feature-central-lock", "label": "Central Lock", "type": "feature", "featureId": "central-lock" },
+          { "id": "feature-door-unlock", "label": "Door Unlock", "type": "feature", "featureId": "door-unlock" },
+          { "id": "feature-wiper", "label": "Wiper", "type": "feature", "featureId": "wiper" },
+          { "id": "feature-horn", "label": "Horn", "type": "feature", "featureId": "horn" }
+        ]
+      },
+      {
+        "id": "powertrain",
+        "label": "Powertrain",
+        "type": "domain",
+        "domain": "powertrain",
+        "children": [
+          { "id": "feature-vehicle-start", "label": "Vehicle Start", "type": "feature", "featureId": "vehicle-start" },
+          { "id": "feature-engine-start", "label": "Engine Start", "type": "feature", "featureId": "engine-start" },
+          { "id": "feature-battery-charging", "label": "Battery Charging", "type": "feature", "featureId": "battery-charging" }
+        ]
+      },
+      {
+        "id": "chassis",
+        "label": "Chassis",
+        "type": "domain",
+        "domain": "chassis",
+        "children": [
+          { "id": "feature-abs", "label": "ABS", "type": "feature", "featureId": "abs" },
+          { "id": "feature-epb", "label": "Electric Parking Brake", "type": "feature", "featureId": "electric-parking-brake" },
+          { "id": "feature-steering-assist", "label": "Steering Assist", "type": "feature", "featureId": "steering-assist" }
+        ]
+      },
+      {
+        "id": "adas",
+        "label": "ADAS",
+        "type": "domain",
+        "domain": "adas",
+        "children": [
+          { "id": "feature-adaptive-cruise", "label": "Adaptive Cruise", "type": "feature", "featureId": "adaptive-cruise" }
+        ]
+      },
+      {
+        "id": "comfort",
+        "label": "Comfort",
+        "type": "domain",
+        "domain": "comfort",
+        "children": [
+          { "id": "feature-hvac", "label": "HVAC", "type": "feature", "featureId": "hvac" }
+        ]
+      },
+      {
+        "id": "infotainment",
+        "label": "Infotainment",
+        "type": "domain",
+        "domain": "infotainment",
+        "children": []
+      },
+      {
+        "id": "safety",
+        "label": "Safety",
+        "type": "domain",
+        "domain": "safety",
+        "children": [
+          { "id": "feature-airbag", "label": "Airbag Trigger", "type": "feature", "featureId": "airbag-trigger" }
+        ]
+      },
+      {
+        "id": "diagnostics",
+        "label": "Diagnostics",
+        "type": "domain",
+        "domain": "diagnostics",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "autosar-mode",
+    "label": "AUTOSAR",
+    "type": "mode",
+    "children": []
+  },
+  {
+    "id": "iso26262",
+    "label": "ISO26262",
+    "type": "domain",
+    "domain": "iso26262",
+    "children": []
+  }
+]

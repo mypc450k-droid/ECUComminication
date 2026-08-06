@@ -1,0 +1,467 @@
+[
+  {
+    "id": "power-window",
+    "name": "Power Window",
+    "domain": "body",
+    "description": "Driver operates window switch to raise or lower the front left power window via LIN and CAN communication chain.",
+    "driverInput": "Window switch pressed (Up/Down)",
+    "physicalOutput": "Window motor drives glass to target position",
+    "involvedEcus": ["door-fl", "bcm", "gateway", "pw-fl"],
+    "involvedNetworks": ["LIN", "CAN_HS"],
+    "flowStages": [
+      { "id": "pw-input", "name": "Driver Input", "type": "input", "description": "Driver presses window switch on door panel", "duration": 1000 },
+      { "id": "pw-switch", "name": "Window Switch", "type": "switch", "description": "Mechanical switch generates LIN signal", "duration": 800 },
+      { "id": "pw-lin", "name": "LIN Bus", "type": "lin", "description": "LIN frame 0x3A transmitted at 19.2 kbps", "duration": 600 },
+      { "id": "pw-door-ecu", "name": "Door ECU FL", "type": "ecu", "ecuId": "door-fl", "description": "Door ECU receives switch state via LIN slave", "duration": 800 },
+      { "id": "pw-gateway", "name": "Gateway ECU", "type": "gateway", "ecuId": "gateway", "description": "Gateway routes CAN message to BCM domain", "duration": 700 },
+      { "id": "pw-can", "name": "CAN HS Bus", "type": "can", "description": "CAN ID 0x245 Power Window Command on 500 kbps bus", "duration": 600 },
+      { "id": "pw-bcm", "name": "BCM", "type": "ecu", "ecuId": "bcm", "description": "BCM validates request and sends window command", "duration": 800 },
+      { "id": "pw-autosar", "name": "AUTOSAR Stack", "type": "autosar", "description": "SWC → RTE → COM → PduR → CanIf → CanDrv", "duration": 1000 },
+      { "id": "pw-mcal", "name": "MCAL", "type": "mcal", "description": "PWM driver configures motor control pins", "duration": 600 },
+      { "id": "pw-driver", "name": "Motor Driver", "type": "driver", "description": "H-bridge driver enables window motor current", "duration": 700 },
+      { "id": "pw-hw", "name": "Window Motor", "type": "hardware", "description": "12V DC motor drives window regulator", "duration": 800 },
+      { "id": "pw-output", "name": "Window Movement", "type": "output", "description": "Glass moves to requested position with anti-pinch monitoring", "duration": 1200 }
+    ],
+    "signalFlowStages": [
+      { "id": "pw-swc-tx", "name": "WindowControl SWC", "type": "swc", "description": "Application SWC processes switch input", "duration": 500 },
+      { "id": "pw-port-tx", "name": "Sender Port", "type": "port", "description": "WindowCmd signal written to sender port", "duration": 400 },
+      { "id": "pw-rte-tx", "name": "RTE", "type": "rte", "description": "RTE maps port to COM signal", "duration": 400 },
+      { "id": "pw-com-tx", "name": "COM", "type": "com", "description": "Signal packed into PDU 0x245", "duration": 400 },
+      { "id": "pw-pdur-tx", "name": "PduR", "type": "pdur", "description": "PDU routed to CAN interface", "duration": 400 },
+      { "id": "pw-canif-tx", "name": "CanIf", "type": "canif", "description": "PDU mapped to CAN ID 0x245 HTH", "duration": 400 },
+      { "id": "pw-candrv-tx", "name": "CanDrv", "type": "candrv", "description": "CAN frame transmitted to controller", "duration": 400 },
+      { "id": "pw-mcal-tx", "name": "MCAL", "type": "mcal", "description": "CAN controller registers configured", "duration": 400 },
+      { "id": "pw-ctrl-tx", "name": "CAN Controller", "type": "controller", "description": "Frame placed on CAN bus", "duration": 400 },
+      { "id": "pw-bus", "name": "CAN Bus", "type": "bus", "description": "Differential signal on CAN_H/CAN_L", "duration": 500 },
+      { "id": "pw-mcal-rx", "name": "MCAL RX", "type": "mcal", "description": "Receiving ECU controller captures frame", "duration": 400 },
+      { "id": "pw-candrv-rx", "name": "CanDrv RX", "type": "candrv", "description": "Frame indication to CanIf", "duration": 400 },
+      { "id": "pw-canif-rx", "name": "CanIf RX", "type": "canif", "description": "HRH matched, PDU extracted", "duration": 400 },
+      { "id": "pw-pdur-rx", "name": "PduR RX", "type": "pdur", "description": "PDU routed to COM layer", "duration": 400 },
+      { "id": "pw-com-rx", "name": "COM RX", "type": "com", "description": "Signal unpacked from PDU", "duration": 400 },
+      { "id": "pw-rte-rx", "name": "RTE RX", "type": "rte", "description": "Signal delivered to receiver port", "duration": 400 },
+      { "id": "pw-swc-rx", "name": "MotorControl SWC", "type": "swc", "description": "Receiver SWC activates motor runnable", "duration": 500 }
+    ]
+  },
+  {
+    "id": "headlamp",
+    "name": "Headlamp",
+    "domain": "body",
+    "description": "Driver activates headlamp switch, BCM processes request and commands lighting ECU via CAN.",
+    "driverInput": "Headlamp switch to ON position",
+    "physicalOutput": "LED headlamp illuminates with adaptive beam pattern",
+    "involvedEcus": ["bcm", "gateway", "lighting"],
+    "involvedNetworks": ["CAN_HS"],
+    "flowStages": [
+      { "id": "hl-input", "name": "Driver Input", "type": "input", "description": "Driver turns headlamp switch ON", "duration": 800 },
+      { "id": "hl-switch", "name": "Light Switch", "type": "switch", "description": "Switch position read by BCM directly", "duration": 600 },
+      { "id": "hl-bcm", "name": "BCM", "type": "ecu", "ecuId": "bcm", "description": "BCM LightControl SWC processes switch state", "duration": 800 },
+      { "id": "hl-can", "name": "CAN HS Bus", "type": "can", "description": "CAN ID 0x420 Headlamp Command transmitted", "duration": 600 },
+      { "id": "hl-gateway", "name": "Gateway", "type": "gateway", "ecuId": "gateway", "description": "Gateway forwards to lighting domain", "duration": 600 },
+      { "id": "hl-lighting", "name": "Lighting ECU", "type": "ecu", "ecuId": "lighting", "description": "Lighting ECU receives headlamp command", "duration": 800 },
+      { "id": "hl-autosar", "name": "AUTOSAR Stack", "type": "autosar", "description": "Full AUTOSAR communication stack active", "duration": 900 },
+      { "id": "hl-mcal", "name": "MCAL PWM", "type": "mcal", "description": "PWM channels configured for LED drivers", "duration": 600 },
+      { "id": "hl-driver", "name": "LED Driver IC", "type": "driver", "description": "Constant current LED driver activated", "duration": 700 },
+      { "id": "hl-hw", "name": "LED Array", "type": "hardware", "description": "Matrix LED headlamp segments illuminate", "duration": 800 },
+      { "id": "hl-output", "name": "Headlamp ON", "type": "output", "description": "Adaptive beam pattern projected on road", "duration": 1000 }
+    ],
+    "signalFlowStages": [
+      { "id": "hl-swc", "name": "LightControl SWC", "type": "swc", "description": "Processes lighting mode request", "duration": 400 },
+      { "id": "hl-port", "name": "Sender Port", "type": "port", "description": "HeadlampCmd signal output", "duration": 400 },
+      { "id": "hl-rte", "name": "RTE", "type": "rte", "description": "Signal routing via RTE", "duration": 400 },
+      { "id": "hl-com", "name": "COM", "type": "com", "description": "PDU 0x420 assembly", "duration": 400 },
+      { "id": "hl-pdur", "name": "PduR", "type": "pdur", "description": "Route to CanIf", "duration": 400 },
+      { "id": "hl-canif", "name": "CanIf", "type": "canif", "description": "CAN ID mapping", "duration": 400 },
+      { "id": "hl-candrv", "name": "CanDrv", "type": "candrv", "description": "Frame transmission", "duration": 400 },
+      { "id": "hl-bus", "name": "CAN Bus", "type": "bus", "description": "Bus propagation", "duration": 500 },
+      { "id": "hl-rx-swc", "name": "HeadlampDriver SWC", "type": "swc", "description": "Receiver SWC activates LED control", "duration": 500 }
+    ]
+  },
+  {
+    "id": "tail-lamp",
+    "name": "Tail Lamp",
+    "domain": "body",
+    "description": "Tail lamp activation when ignition is on or brake pedal is pressed.",
+    "driverInput": "Ignition ON or brake pedal pressed",
+    "physicalOutput": "Tail and brake lamps illuminate",
+    "involvedEcus": ["bcm", "lighting"],
+    "involvedNetworks": ["CAN_HS"],
+    "flowStages": [
+      { "id": "tl-input", "name": "Driver Input", "type": "input", "description": "Brake pedal switch activated", "duration": 700 },
+      { "id": "tl-bcm", "name": "BCM", "type": "ecu", "ecuId": "bcm", "description": "BCM detects brake switch via hardwire", "duration": 700 },
+      { "id": "tl-can", "name": "CAN HS", "type": "can", "description": "Tail lamp command CAN 0x421", "duration": 600 },
+      { "id": "tl-lighting", "name": "Lighting ECU", "type": "ecu", "ecuId": "lighting", "description": "Activates tail lamp outputs", "duration": 700 },
+      { "id": "tl-autosar", "name": "AUTOSAR", "type": "autosar", "description": "Stack processes brake lamp signal", "duration": 800 },
+      { "id": "tl-output", "name": "Tail Lamps ON", "type": "output", "description": "Rear lamps illuminate red", "duration": 900 }
+    ],
+    "signalFlowStages": [
+      { "id": "tl-swc", "name": "BrakeLamp SWC", "type": "swc", "description": "Brake status processing", "duration": 400 },
+      { "id": "tl-com", "name": "COM", "type": "com", "description": "Signal to PDU mapping", "duration": 400 },
+      { "id": "tl-bus", "name": "CAN Bus", "type": "bus", "description": "Message propagation", "duration": 500 },
+      { "id": "tl-rx", "name": "TailLamp SWC", "type": "swc", "description": "Output activation", "duration": 400 }
+    ]
+  },
+  {
+    "id": "turn-indicator",
+    "name": "Turn Indicator",
+    "domain": "body",
+    "description": "Turn signal lever activates indicator lamps with timed flash pattern.",
+    "driverInput": "Turn signal lever left or right",
+    "physicalOutput": "Indicator lamps flash at 400ms interval",
+    "involvedEcus": ["bcm", "lighting"],
+    "involvedNetworks": ["CAN_HS", "LIN"],
+    "flowStages": [
+      { "id": "ti-input", "name": "Lever Input", "type": "input", "description": "Turn signal stalk moved", "duration": 700 },
+      { "id": "ti-bcm", "name": "BCM", "type": "ecu", "ecuId": "bcm", "description": "BCM starts flash timer sequence", "duration": 700 },
+      { "id": "ti-can", "name": "CAN HS", "type": "can", "description": "Indicator command transmitted", "duration": 600 },
+      { "id": "ti-lighting", "name": "Lighting ECU", "type": "ecu", "ecuId": "lighting", "description": "Controls indicator lamp outputs", "duration": 700 },
+      { "id": "ti-output", "name": "Indicator Flash", "type": "output", "description": "Lamps flash with audible click", "duration": 900 }
+    ],
+    "signalFlowStages": [
+      { "id": "ti-swc", "name": "Indicator SWC", "type": "swc", "description": "Flash sequence logic", "duration": 400 },
+      { "id": "ti-bus", "name": "CAN Bus", "type": "bus", "description": "Periodic frame transmission", "duration": 500 },
+      { "id": "ti-rx", "name": "LampDriver SWC", "type": "swc", "description": "GPIO toggle for flash", "duration": 400 }
+    ]
+  },
+  {
+    "id": "hazard-lamp",
+    "name": "Hazard Lamp",
+    "domain": "body",
+    "description": "Hazard warning switch activates all indicator lamps simultaneously.",
+    "driverInput": "Hazard warning button pressed",
+    "physicalOutput": "All four indicator lamps flash together",
+    "involvedEcus": ["bcm", "lighting"],
+    "involvedNetworks": ["CAN_HS"],
+    "flowStages": [
+      { "id": "hz-input", "name": "Hazard Button", "type": "input", "description": "Red hazard button pressed", "duration": 700 },
+      { "id": "hz-bcm", "name": "BCM", "type": "ecu", "ecuId": "bcm", "description": "BCM activates hazard mode", "duration": 700 },
+      { "id": "hz-can", "name": "CAN HS", "type": "can", "description": "Hazard command to all lighting outputs", "duration": 600 },
+      { "id": "hz-lighting", "name": "Lighting ECU", "type": "ecu", "ecuId": "lighting", "description": "All indicator outputs enabled", "duration": 700 },
+      { "id": "hz-output", "name": "Hazard Flash", "type": "output", "description": "All indicators flash synchronously", "duration": 900 }
+    ],
+    "signalFlowStages": [
+      { "id": "hz-swc", "name": "Hazard SWC", "type": "swc", "description": "Hazard mode activation", "duration": 400 },
+      { "id": "hz-bus", "name": "CAN Bus", "type": "bus", "description": "Broadcast hazard signal", "duration": 500 },
+      { "id": "hz-rx", "name": "All Lamp SWCs", "type": "swc", "description": "Simultaneous output activation", "duration": 400 }
+    ]
+  },
+  {
+    "id": "central-lock",
+    "name": "Central Lock",
+    "domain": "body",
+    "description": "Central locking command locks all doors when driver presses lock button on key fob.",
+    "driverInput": "Key fob lock button pressed",
+    "physicalOutput": "All door locks engage, indicator flash confirms",
+    "involvedEcus": ["bcm", "gateway", "door-fl", "door-fr", "door-rl", "door-rr"],
+    "involvedNetworks": ["CAN_HS", "LIN"],
+    "flowStages": [
+      { "id": "cl-input", "name": "Key Fob", "type": "input", "description": "RF signal from key fob received", "duration": 700 },
+      { "id": "cl-bcm", "name": "BCM", "type": "ecu", "ecuId": "bcm", "description": "BCM validates RF authentication", "duration": 800 },
+      { "id": "cl-can", "name": "CAN HS", "type": "can", "description": "Lock command CAN 0x310 broadcast", "duration": 600 },
+      { "id": "cl-gateway", "name": "Gateway", "type": "gateway", "ecuId": "gateway", "description": "Routes to all door domains", "duration": 600 },
+      { "id": "cl-lin", "name": "LIN Bus", "type": "lin", "description": "LIN frames to each door ECU", "duration": 600 },
+      { "id": "cl-doors", "name": "Door ECUs", "type": "ecu", "ecuId": "door-fl", "description": "All four door ECUs receive lock command", "duration": 800 },
+      { "id": "cl-autosar", "name": "AUTOSAR", "type": "autosar", "description": "Lock control SWC stack processing", "duration": 800 },
+      { "id": "cl-output", "name": "Doors Locked", "type": "output", "description": "Actuators engage, confirmation flash", "duration": 900 }
+    ],
+    "signalFlowStages": [
+      { "id": "cl-swc", "name": "LockControl SWC", "type": "swc", "description": "Central lock logic", "duration": 400 },
+      { "id": "cl-com", "name": "COM", "type": "com", "description": "LockCmd signal PDU", "duration": 400 },
+      { "id": "cl-bus", "name": "CAN Bus", "type": "bus", "description": "Broadcast to all nodes", "duration": 500 },
+      { "id": "cl-rx", "name": "DoorLock SWC", "type": "swc", "description": "Actuator control per door", "duration": 400 }
+    ]
+  },
+  {
+    "id": "door-unlock",
+    "name": "Door Unlock",
+    "domain": "body",
+    "description": "Proximity unlock when authorized key fob approaches vehicle.",
+    "driverInput": "Key fob proximity detected",
+    "physicalOutput": "Driver door unlocks, welcome lights activate",
+    "involvedEcus": ["bcm", "door-fl", "lighting"],
+    "involvedNetworks": ["CAN_HS", "LIN"],
+    "flowStages": [
+      { "id": "du-input", "name": "Proximity", "type": "input", "description": "BLE/UHF proximity sensor detects key", "duration": 700 },
+      { "id": "du-bcm", "name": "BCM", "type": "ecu", "ecuId": "bcm", "description": "BCM authenticates and unlocks driver door", "duration": 800 },
+      { "id": "du-lin", "name": "LIN", "type": "lin", "description": "Unlock command via LIN to door ECU", "duration": 600 },
+      { "id": "du-door", "name": "Door ECU FL", "type": "ecu", "ecuId": "door-fl", "description": "Actuator releases door lock", "duration": 700 },
+      { "id": "du-output", "name": "Door Unlocked", "type": "output", "description": "Lock disengages, puddle lights ON", "duration": 900 }
+    ],
+    "signalFlowStages": [
+      { "id": "du-swc", "name": "AccessControl SWC", "type": "swc", "description": "Proximity authentication", "duration": 400 },
+      { "id": "du-lin-com", "name": "LinIf/COM", "type": "com", "description": "LIN schedule unlock frame", "duration": 400 },
+      { "id": "du-rx", "name": "DoorActuator SWC", "type": "swc", "description": "Unlock actuator drive", "duration": 400 }
+    ]
+  },
+  {
+    "id": "wiper",
+    "name": "Wiper",
+    "domain": "body",
+    "description": "Wiper switch activates intermittent or continuous wiper operation.",
+    "driverInput": "Wiper stalk switch position",
+    "physicalOutput": "Wiper motor drives blades across windshield",
+    "involvedEcus": ["bcm"],
+    "involvedNetworks": ["CAN_LS"],
+    "flowStages": [
+      { "id": "wp-input", "name": "Wiper Switch", "type": "input", "description": "Stalk switch position changed", "duration": 700 },
+      { "id": "wp-bcm", "name": "BCM", "type": "ecu", "ecuId": "bcm", "description": "BCM WiperControl SWC activated", "duration": 700 },
+      { "id": "wp-autosar", "name": "AUTOSAR", "type": "autosar", "description": "Internal BCM stack processing", "duration": 700 },
+      { "id": "wp-mcal", "name": "MCAL", "type": "mcal", "description": "Relay driver output configured", "duration": 600 },
+      { "id": "wp-output", "name": "Wiper Moving", "type": "output", "description": "Wiper motor drives blade sweep", "duration": 900 }
+    ],
+    "signalFlowStages": [
+      { "id": "wp-swc", "name": "WiperControl SWC", "type": "swc", "description": "Speed and interval logic", "duration": 400 },
+      { "id": "wp-mcal", "name": "Dio/Pwm MCAL", "type": "mcal", "description": "Direct GPIO relay control", "duration": 400 },
+      { "id": "wp-rx", "name": "Motor Relay", "type": "hardware", "description": "Wiper motor energized", "duration": 400 }
+    ]
+  },
+  {
+    "id": "horn",
+    "name": "Horn",
+    "domain": "body",
+    "description": "Horn button activates horn relay for audible warning.",
+    "driverInput": "Horn button pressed on steering wheel",
+    "physicalOutput": "Horn emits audible warning tone",
+    "involvedEcus": ["bcm", "steering"],
+    "involvedNetworks": ["CAN_HS"],
+    "flowStages": [
+      { "id": "hn-input", "name": "Horn Button", "type": "input", "description": "Steering wheel horn pad pressed", "duration": 600 },
+      { "id": "hn-steering", "name": "Steering ECU", "type": "ecu", "ecuId": "steering", "description": "SAS reads horn switch via LIN", "duration": 700 },
+      { "id": "hn-can", "name": "CAN HS", "type": "can", "description": "Horn request transmitted", "duration": 600 },
+      { "id": "hn-bcm", "name": "BCM", "type": "ecu", "ecuId": "bcm", "description": "BCM activates horn relay", "duration": 700 },
+      { "id": "hn-output", "name": "Horn Sound", "type": "output", "description": "Electromechanical horn activated", "duration": 900 }
+    ],
+    "signalFlowStages": [
+      { "id": "hn-swc", "name": "HornSWC", "type": "swc", "description": "Horn request processing", "duration": 400 },
+      { "id": "hn-bus", "name": "CAN Bus", "type": "bus", "description": "Horn signal propagation", "duration": 500 },
+      { "id": "hn-rx", "name": "HornRelay SWC", "type": "swc", "description": "Relay driver activation", "duration": 400 }
+    ]
+  },
+  {
+    "id": "hvac",
+    "name": "HVAC",
+    "domain": "comfort",
+    "description": "Climate control adjusts cabin temperature based on user setpoint via CAN communication.",
+    "driverInput": "Temperature setpoint adjusted on climate panel",
+    "physicalOutput": "Blower speed and temperature blend door adjust",
+    "involvedEcus": ["hvac", "bcm", "gateway"],
+    "involvedNetworks": ["CAN_HS", "LIN"],
+    "flowStages": [
+      { "id": "hv-input", "name": "Climate Panel", "type": "input", "description": "User sets 22°C on touch panel", "duration": 700 },
+      { "id": "hv-can", "name": "CAN HS", "type": "can", "description": "Setpoint CAN 0x340 to HVAC ECU", "duration": 600 },
+      { "id": "hv-hvac", "name": "HVAC ECU", "type": "ecu", "ecuId": "hvac", "description": "Climate control algorithm runs", "duration": 800 },
+      { "id": "hv-autosar", "name": "AUTOSAR", "type": "autosar", "description": "ClimateControl SWC processing", "duration": 800 },
+      { "id": "hv-lin", "name": "LIN", "type": "lin", "description": "Actuator commands via LIN", "duration": 600 },
+      { "id": "hv-mcal", "name": "MCAL", "type": "mcal", "description": "PWM blower and stepper drivers", "duration": 600 },
+      { "id": "hv-output", "name": "Climate Adjusted", "type": "output", "description": "Blower and blend doors repositioned", "duration": 900 }
+    ],
+    "signalFlowStages": [
+      { "id": "hv-swc", "name": "ClimateControl SWC", "type": "swc", "description": "PID temperature control", "duration": 400 },
+      { "id": "hv-com", "name": "COM", "type": "com", "description": "Setpoint signal routing", "duration": 400 },
+      { "id": "hv-bus", "name": "CAN Bus", "type": "bus", "description": "Temperature request frame", "duration": 500 },
+      { "id": "hv-rx", "name": "ActuatorControl SWC", "type": "swc", "description": "Blower and door control", "duration": 400 }
+    ]
+  },
+  {
+    "id": "electric-parking-brake",
+    "name": "Electric Parking Brake",
+    "domain": "chassis",
+    "description": "EPB switch or auto-hold activates electric parking brake actuators.",
+    "driverInput": "EPB switch pressed or auto-hold engaged",
+    "physicalOutput": "Parking brake calipers clamp brake discs",
+    "involvedEcus": ["epb", "esp", "gateway", "cluster"],
+    "involvedNetworks": ["CAN_HS"],
+    "flowStages": [
+      { "id": "epb-input", "name": "EPB Switch", "type": "input", "description": "Driver pulls EPB switch", "duration": 700 },
+      { "id": "epb-can", "name": "CAN HS", "type": "can", "description": "EPB request on CAN 0x0E0", "duration": 600 },
+      { "id": "epb-esp", "name": "ESP ECU", "type": "ecu", "ecuId": "esp", "description": "ESP validates vehicle speed = 0", "duration": 700 },
+      { "id": "epb-ecu", "name": "EPB ECU", "type": "ecu", "ecuId": "epb", "description": "EPB actuator control activated", "duration": 800 },
+      { "id": "epb-autosar", "name": "AUTOSAR", "type": "autosar", "description": "EPBControl SWC ASIL-D processing", "duration": 800 },
+      { "id": "epb-mcal", "name": "MCAL", "type": "mcal", "description": "Motor driver for caliper actuators", "duration": 600 },
+      { "id": "epb-output", "name": "Brake Applied", "type": "output", "description": "Calipers clamp, cluster shows EPB icon", "duration": 900 }
+    ],
+    "signalFlowStages": [
+      { "id": "epb-swc", "name": "EPBControl SWC", "type": "swc", "description": "ASIL-D brake logic", "duration": 400 },
+      { "id": "epb-com", "name": "COM", "type": "com", "description": "EPB status PDU", "duration": 400 },
+      { "id": "epb-bus", "name": "CAN Bus", "type": "bus", "description": "Safety-critical frame", "duration": 500 },
+      { "id": "epb-rx", "name": "CaliperDriver SWC", "type": "swc", "description": "Actuator motor control", "duration": 400 }
+    ]
+  },
+  {
+    "id": "battery-charging",
+    "name": "Battery Charging",
+    "domain": "powertrain",
+    "description": "Vehicle connected to charger initiates AC charging session with BMS coordination.",
+    "driverInput": "Charging cable connected and authorized",
+    "physicalOutput": "Battery charges at negotiated power level",
+    "involvedEcus": ["charging", "bms", "gateway", "cluster"],
+    "involvedNetworks": ["CAN_HS", "Ethernet"],
+    "flowStages": [
+      { "id": "bc-input", "name": "Cable Connected", "type": "input", "description": "CP/PP signals detect charger connection", "duration": 700 },
+      { "id": "bc-charging", "name": "Charging ECU", "type": "ecu", "ecuId": "charging", "description": "OBC negotiates with EVSE via PLC", "duration": 900 },
+      { "id": "bc-can", "name": "CAN HS", "type": "can", "description": "Charge enable to BMS CAN 0x250", "duration": 600 },
+      { "id": "bc-bms", "name": "BMS", "type": "ecu", "ecuId": "bms", "description": "BMS authorizes charging current", "duration": 800 },
+      { "id": "bc-autosar", "name": "AUTOSAR", "type": "autosar", "description": "ChargeControl SWC stack", "duration": 800 },
+      { "id": "bc-mcal", "name": "MCAL", "type": "mcal", "description": "Power stage PWM control", "duration": 600 },
+      { "id": "bc-output", "name": "Charging Active", "type": "output", "description": "Current flows to battery pack", "duration": 1000 }
+    ],
+    "signalFlowStages": [
+      { "id": "bc-swc", "name": "ChargeControl SWC", "type": "swc", "description": "ISO 15118 negotiation", "duration": 400 },
+      { "id": "bc-com", "name": "COM", "type": "com", "description": "Charge status signals", "duration": 400 },
+      { "id": "bc-bus", "name": "CAN Bus", "type": "bus", "description": "BMS communication frames", "duration": 500 },
+      { "id": "bc-rx", "name": "BMSControl SWC", "type": "swc", "description": "Cell balancing and current limit", "duration": 400 }
+    ]
+  },
+  {
+    "id": "vehicle-start",
+    "name": "Vehicle Start",
+    "domain": "powertrain",
+    "description": "Keyless start sequence waking vehicle networks and enabling drive-ready state.",
+    "driverInput": "Start button pressed with key present",
+    "physicalOutput": "Vehicle transitions to READY state, systems online",
+    "involvedEcus": ["bcm", "gateway", "bms", "motor-controller", "cluster"],
+    "involvedNetworks": ["CAN_HS", "Ethernet"],
+    "flowStages": [
+      { "id": "vs-input", "name": "Start Button", "type": "input", "description": "Driver presses start/stop button", "duration": 700 },
+      { "id": "vs-bcm", "name": "BCM", "type": "ecu", "ecuId": "bcm", "description": "BCM validates key authentication", "duration": 800 },
+      { "id": "vs-gateway", "name": "Gateway", "type": "gateway", "ecuId": "gateway", "description": "Network wake-up sequence initiated", "duration": 700 },
+      { "id": "vs-can", "name": "CAN HS", "type": "can", "description": "Power mode broadcast to all ECUs", "duration": 600 },
+      { "id": "vs-bms", "name": "BMS", "type": "ecu", "ecuId": "bms", "description": "HV system pre-checks completed", "duration": 800 },
+      { "id": "vs-mcu", "name": "Motor Controller", "type": "ecu", "ecuId": "motor-controller", "description": "Drive system enabled", "duration": 800 },
+      { "id": "vs-output", "name": "READY State", "type": "output", "description": "Cluster shows READY, systems active", "duration": 900 }
+    ],
+    "signalFlowStages": [
+      { "id": "vs-swc", "name": "PowerMode SWC", "type": "swc", "description": "EcuM state transitions", "duration": 400 },
+      { "id": "vs-com", "name": "COM", "type": "com", "description": "Network management PDUs", "duration": 400 },
+      { "id": "vs-bus", "name": "CAN Bus", "type": "bus", "description": "NM frames wake all nodes", "duration": 500 },
+      { "id": "vs-rx", "name": "All ECU SWCs", "type": "swc", "description": "Application layer activation", "duration": 400 }
+    ]
+  },
+  {
+    "id": "engine-start",
+    "name": "Engine Start",
+    "domain": "powertrain",
+    "description": "Cranking sequence for ICE engine start with fuel injection and ignition timing.",
+    "driverInput": "Start button with brake pedal pressed",
+    "physicalOutput": "Engine cranks and reaches idle speed",
+    "involvedEcus": ["engine", "gateway", "transmission", "cluster"],
+    "involvedNetworks": ["CAN_HS"],
+    "flowStages": [
+      { "id": "es-input", "name": "Start Request", "type": "input", "description": "Start button + brake interlock", "duration": 700 },
+      { "id": "es-gateway", "name": "Gateway", "type": "gateway", "ecuId": "gateway", "description": "Start authorization routed", "duration": 600 },
+      { "id": "es-engine", "name": "Engine ECU", "type": "ecu", "ecuId": "engine", "description": "ECM initiates crank sequence", "duration": 900 },
+      { "id": "es-autosar", "name": "AUTOSAR", "type": "autosar", "description": "EngineStart SWC ASIL-C logic", "duration": 800 },
+      { "id": "es-mcal", "name": "MCAL", "type": "mcal", "description": "Injector and ignition drivers", "duration": 600 },
+      { "id": "es-hw", "name": "Engine Hardware", "type": "hardware", "description": "Starter motor cranks, fuel injected", "duration": 900 },
+      { "id": "es-output", "name": "Engine Running", "type": "output", "description": "Idle speed achieved, cluster RPM display", "duration": 1000 }
+    ],
+    "signalFlowStages": [
+      { "id": "es-swc", "name": "EngineStart SWC", "type": "swc", "description": "Crank-to-run state machine", "duration": 400 },
+      { "id": "es-com", "name": "COM", "type": "com", "description": "Engine status signals", "duration": 400 },
+      { "id": "es-bus", "name": "CAN Bus", "type": "bus", "description": "RPM and status broadcast", "duration": 500 },
+      { "id": "es-rx", "name": "Cluster SWC", "type": "swc", "description": "RPM display update", "duration": 400 }
+    ]
+  },
+  {
+    "id": "adaptive-cruise",
+    "name": "Adaptive Cruise",
+    "domain": "adas",
+    "description": "ACC maintains set speed and adjusts for detected vehicles using radar fusion.",
+    "driverInput": "ACC set speed button on steering wheel",
+    "physicalOutput": "Vehicle accelerates/decelerates to maintain gap",
+    "involvedEcus": ["adas", "radar", "esp", "engine", "gateway"],
+    "involvedNetworks": ["CAN_HS", "Ethernet"],
+    "flowStages": [
+      { "id": "acc-input", "name": "Set Speed", "type": "input", "description": "Driver sets 120 km/h via stalk", "duration": 700 },
+      { "id": "acc-steering", "name": "Steering ECU", "type": "ecu", "ecuId": "steering", "description": "Stalk input forwarded via CAN", "duration": 700 },
+      { "id": "acc-adas", "name": "ADAS ECU", "type": "ecu", "ecuId": "adas", "description": "ACC algorithm processes setpoint", "duration": 900 },
+      { "id": "acc-radar", "name": "Radar", "type": "ecu", "ecuId": "radar", "description": "Object list via Ethernet to ADAS", "duration": 800 },
+      { "id": "acc-ethernet", "name": "Ethernet", "type": "can", "description": "High-bandwidth sensor data transfer", "duration": 600 },
+      { "id": "acc-can", "name": "CAN HS", "type": "can", "description": "Torque request to engine CAN 0x180", "duration": 600 },
+      { "id": "acc-engine", "name": "Engine ECU", "type": "ecu", "ecuId": "engine", "description": "Torque modulation for speed control", "duration": 800 },
+      { "id": "acc-output", "name": "Speed Maintained", "type": "output", "description": "Vehicle maintains gap to lead vehicle", "duration": 900 }
+    ],
+    "signalFlowStages": [
+      { "id": "acc-swc", "name": "ACC SWC", "type": "swc", "description": "Speed and gap control algorithm", "duration": 400 },
+      { "id": "acc-eth", "name": "SoAd/Ethernet", "type": "com", "description": "Radar object list reception", "duration": 400 },
+      { "id": "acc-com", "name": "COM", "type": "com", "description": "Torque request signal", "duration": 400 },
+      { "id": "acc-bus", "name": "CAN Bus", "type": "bus", "description": "Torque command frame", "duration": 500 },
+      { "id": "acc-rx", "name": "TorqueControl SWC", "type": "swc", "description": "Engine torque adjustment", "duration": 400 }
+    ]
+  },
+  {
+    "id": "abs",
+    "name": "ABS",
+    "domain": "chassis",
+    "description": "ABS prevents wheel lock during emergency braking by modulating brake pressure.",
+    "driverInput": "Emergency brake pedal application",
+    "physicalOutput": "Brake pressure modulated, wheels maintain traction",
+    "involvedEcus": ["abs", "esp", "gateway", "cluster"],
+    "involvedNetworks": ["CAN_HS", "FlexRay"],
+    "flowStages": [
+      { "id": "abs-input", "name": "Brake Pedal", "type": "input", "description": "Hard brake pedal application detected", "duration": 600 },
+      { "id": "abs-abs", "name": "ABS ECU", "type": "ecu", "ecuId": "abs", "description": "Wheel speed sensors show deceleration", "duration": 800 },
+      { "id": "abs-autosar", "name": "AUTOSAR", "type": "autosar", "description": "ABSControl SWC ASIL-D processing", "duration": 800 },
+      { "id": "abs-mcal", "name": "MCAL", "type": "mcal", "description": "Hydraulic valve driver control", "duration": 600 },
+      { "id": "abs-hw", "name": "Hydraulic Valves", "type": "hardware", "description": "Individual wheel pressure modulation", "duration": 800 },
+      { "id": "abs-can", "name": "CAN HS", "type": "can", "description": "ABS active status broadcast", "duration": 600 },
+      { "id": "abs-output", "name": "ABS Active", "type": "output", "description": "Vehicle maintains steering control", "duration": 900 }
+    ],
+    "signalFlowStages": [
+      { "id": "abs-swc", "name": "ABSControl SWC", "type": "swc", "description": "Slip ratio calculation", "duration": 400 },
+      { "id": "abs-com", "name": "COM", "type": "com", "description": "ABS status PDU", "duration": 400 },
+      { "id": "abs-bus", "name": "FlexRay/CAN", "type": "bus", "description": "Safety-critical broadcast", "duration": 500 },
+      { "id": "abs-rx", "name": "ValveDriver SWC", "type": "swc", "description": "Pressure modulation output", "duration": 400 }
+    ]
+  },
+  {
+    "id": "airbag-trigger",
+    "name": "Airbag Trigger",
+    "domain": "safety",
+    "description": "Crash detection triggers airbag and restraint system deployment within milliseconds.",
+    "driverInput": "Crash acceleration detected by sensors",
+    "physicalOutput": "Airbags deploy, seatbelt pretensioners fire",
+    "involvedEcus": ["airbag", "gateway", "cluster"],
+    "involvedNetworks": ["CAN_HS"],
+    "flowStages": [
+      { "id": "ab-input", "name": "Crash Sensor", "type": "input", "description": "Accelerometer exceeds threshold", "duration": 400 },
+      { "id": "ab-airbag", "name": "Airbag ECU", "type": "ecu", "ecuId": "airbag", "description": "ACU validates crash within 10ms", "duration": 500 },
+      { "id": "ab-autosar", "name": "AUTOSAR", "type": "autosar", "description": "CrashHandler SWC ASIL-D", "duration": 500 },
+      { "id": "ab-mcal", "name": "MCAL", "type": "mcal", "description": "Squib driver ignition circuits", "duration": 400 },
+      { "id": "ab-hw", "name": "Squib Ignition", "type": "hardware", "description": "Pyrotechnic charges fired", "duration": 500 },
+      { "id": "ab-can", "name": "CAN HS", "type": "can", "description": "Crash signal broadcast 0x090", "duration": 500 },
+      { "id": "ab-output", "name": "Restraints Deployed", "type": "output", "description": "Airbags inflate, pretensioners lock", "duration": 800 }
+    ],
+    "signalFlowStages": [
+      { "id": "ab-swc", "name": "CrashHandler SWC", "type": "swc", "description": "Multi-sensor crash algorithm", "duration": 300 },
+      { "id": "ab-com", "name": "COM", "type": "com", "description": "Crash status PDU", "duration": 300 },
+      { "id": "ab-bus", "name": "CAN Bus", "type": "bus", "description": "Emergency broadcast", "duration": 400 },
+      { "id": "ab-rx", "name": "SquibDriver SWC", "type": "swc", "description": "Deployment command output", "duration": 300 }
+    ]
+  },
+  {
+    "id": "steering-assist",
+    "name": "Steering Assist",
+    "domain": "chassis",
+    "description": "Electric power steering provides torque overlay for lane keeping and parking assist.",
+    "driverInput": "Steering wheel torque and ADAS lane correction request",
+    "physicalOutput": "Steering motor applies assist torque to column",
+    "involvedEcus": ["steering", "adas", "esp", "gateway"],
+    "involvedNetworks": ["CAN_HS"],
+    "flowStages": [
+      { "id": "sa-input", "name": "Steering Torque", "type": "input", "description": "Driver torque sensor reads input", "duration": 600 },
+      { "id": "sa-adas", "name": "ADAS ECU", "type": "ecu", "ecuId": "adas", "description": "Lane keeping torque overlay calculated", "duration": 800 },
+      { "id": "sa-can", "name": "CAN HS", "type": "can", "description": "Assist torque request CAN 0x070", "duration": 600 },
+      { "id": "sa-steering", "name": "Steering ECU", "type": "ecu", "ecuId": "steering", "description": "EPS combines driver and assist torque", "duration": 800 },
+      { "id": "sa-autosar", "name": "AUTOSAR", "type": "autosar", "description": "SteeringAssist SWC ASIL-D", "duration": 800 },
+      { "id": "sa-mcal", "name": "MCAL", "type": "mcal", "description": "Motor PWM and current control", "duration": 600 },
+      { "id": "sa-hw", "name": "EPS Motor", "type": "hardware", "description": "Column-mounted motor applies torque", "duration": 800 },
+      { "id": "sa-output", "name": "Assist Active", "type": "output", "description": "Reduced steering effort applied", "duration": 900 }
+    ],
+    "signalFlowStages": [
+      { "id": "sa-swc", "name": "SteeringAssist SWC", "type": "swc", "description": "Torque overlay algorithm", "duration": 400 },
+      { "id": "sa-com", "name": "COM", "type": "com", "description": "Torque request signal", "duration": 400 },
+      { "id": "sa-bus", "name": "CAN Bus", "type": "bus", "description": "Assist torque frame", "duration": 500 },
+      { "id": "sa-rx", "name": "MotorControl SWC", "type": "swc", "description": "EPS motor drive output", "duration": 400 }
+    ]
+  }
+]
