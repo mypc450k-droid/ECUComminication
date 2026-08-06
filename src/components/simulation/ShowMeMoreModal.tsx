@@ -14,7 +14,7 @@ export function ShowMeMoreModal() {
 
   return (
     <AnimatePresence>
-      {content && (
+      {showMeMoreKey && content && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

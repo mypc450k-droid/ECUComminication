@@ -3,5 +3,9 @@
 import { SimulationEngine } from './simulation/SimulationEngine';
 
 export function FeatureSimulation() {
-  return <SimulationEngine />;
+  return (
+    <div className="h-full min-h-0 flex flex-col">
+      <SimulationEngine />
+    </div>
+  );
 }

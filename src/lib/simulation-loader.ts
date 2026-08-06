@@ -28,6 +28,14 @@ const typeToExplainKey: Record<string, string> = {
   mcal: 'mcal',
   ecu: 'ecu',
   swc: 'swc',
+  bus: 'bus',
+  input: 'input',
+  switch: 'switch',
+  driver: 'driver',
+  hardware: 'hardware',
+  output: 'output',
+  port: 'port',
+  controller: 'controller',
 };
 
 const typeToEcuState: Partial<Record<FlowStage['type'], ECUState>> = {
@@ -128,12 +136,72 @@ export function getSimulationFeature(featureId: string): SimulationFeature | und
   };
 }
 
-export function getExplainWhy(key: string): ExplainWhyContent | undefined {
-  return explainWhyMap[key];
+export function getExplainWhy(key: string): ExplainWhyContent {
+  if (explainWhyMap[key]) {
+    return explainWhyMap[key];
+  }
+
+  const label = key.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  const base = explainWhyMap.ecu;
+
+  return {
+    key,
+    title: `Why ${label}?`,
+    purpose: `The ${label} stage is part of the end-to-end vehicle feature path. It transforms, routes, or acts on signals between driver input and physical output.`,
+    responsibilities: [
+      `Participates in the ${label} step of the feature execution chain`,
+      'Must meet timing and reliability requirements for the domain',
+      'Interfaces with adjacent AUTOSAR or hardware layers',
+    ],
+    realWorldExample: `In a typical body-domain feature, the ${label} layer handles one hop in the signal path from switch to actuator.`,
+    analogy: `Think of ${label} as one station in a relay race — each layer passes the baton (data) to the next.`,
+    oemExample: base.oemExample,
+    interviewQuestions: [
+      `What is the role of ${label} in vehicle E/E architecture?`,
+      `How does ${label} interact with neighboring layers?`,
+      `What failure modes affect ${label}?`,
+    ],
+    commonMistakes: [
+      `Skipping ${label} when tracing a signal end-to-end`,
+      'Assuming all OEMs implement this layer identically',
+    ],
+    vectorTools: base.vectorTools,
+    debuggingMethod: `Trace the feature timeline step-by-step and verify ${label} inputs/outputs with CANoe or ECU logs.`,
+  };
 }
 
-export function getShowMeMore(key: string): ShowMeMoreContent | undefined {
-  return showMeMoreMap[key];
+export function getShowMeMore(key: string): ShowMeMoreContent {
+  if (showMeMoreMap[key]) {
+    return showMeMoreMap[key];
+  }
+
+  const label = key.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  const base = showMeMoreMap.bcm ?? showMeMoreMap.com;
+
+  return {
+    key,
+    title: `${label} — Deep Dive`,
+    architecture: `${label} participates in the distributed architecture spanning multiple ECUs and networks. Signals are defined in ARXML/CAN databases and routed per OEM integration rules.`,
+    signals: [
+      `Primary command/status signals associated with ${label}`,
+      'Network PDUs mapped through COM and PduR configuration',
+    ],
+    requirements: [
+      'Functional safety and timing constraints per feature ASIL',
+      'Diagnostic coverage and DTC reporting where applicable',
+    ],
+    stateMachine: `Typical states: Idle → Request → Active → Complete (varies by ${label} role).`,
+    canFrames: base.canFrames,
+    dbcSignal: base.dbcSignal,
+    autosarMapping: base.autosarMapping,
+    hardwareConnections: base.hardwareConnections,
+    softwareConnections: base.softwareConnections,
+    diagnostics: base.diagnostics,
+    failureModes: base.failureModes,
+    iso26262Impact: base.iso26262Impact,
+    asilLevel: base.asilLevel,
+    oemUsage: base.oemUsage,
+  };
 }
 
 export function getFailureScenarios(): FailureScenario[] {

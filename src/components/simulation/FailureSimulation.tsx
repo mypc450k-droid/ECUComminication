@@ -14,8 +14,8 @@ export function FailureSimulation() {
   const active = failures.find((f) => f.id === activeFailureId);
 
   return (
-    <div className="flex h-full">
-      <div className="w-64 border-r border-cyan-500/10 overflow-y-auto custom-scrollbar p-3">
+    <div className="flex h-full min-h-0">
+      <div className="w-64 shrink-0 border-r border-cyan-500/10 overflow-y-auto custom-scrollbar p-3">
         <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">
           Failure Injection
         </h3>
@@ -38,7 +38,7 @@ export function FailureSimulation() {
         </div>
       </div>
 
-      <div className="flex-1 p-4 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 min-h-0 p-4 overflow-y-auto custom-scrollbar">
         {active ? (
           <motion.div
             key={active.id}

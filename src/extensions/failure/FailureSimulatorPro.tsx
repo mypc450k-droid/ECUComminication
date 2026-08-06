@@ -16,6 +16,7 @@ const FAILURE_CHAIN = [
 export function FailureSimulatorPro() {
   const failures = getFailureScenarios();
   const activeFailureId = useAppStore((s) => s.activeFailureId);
+  const setActiveFailureId = useAppStore((s) => s.setActiveFailureId);
   const failureSimStep = useExtensionStore((s) => s.failureSimStep);
   const failureSimRunning = useExtensionStore((s) => s.failureSimRunning);
   const failureSimAuto = useExtensionStore((s) => s.failureSimAuto);
@@ -24,6 +25,12 @@ export function FailureSimulatorPro() {
   const setFailureSimAuto = useExtensionStore((s) => s.setFailureSimAuto);
 
   const active = activeFailureId ? getFailureById(activeFailureId) : null;
+
+  useEffect(() => {
+    if (!activeFailureId && failures.length > 0) {
+      setActiveFailureId(failures[0].id);
+    }
+  }, [activeFailureId, failures, setActiveFailureId]);
 
   useEffect(() => {
     if (!failureSimRunning || !failureSimAuto) return;
@@ -39,9 +46,10 @@ export function FailureSimulatorPro() {
   }, [failureSimRunning, failureSimAuto, failureSimStep, setFailureSimStep]);
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-cyan-500/10 bg-slate-900/40">
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex shrink-0 items-center gap-2 px-3 py-2 border-b border-cyan-500/10 bg-slate-900/40">
         <button
+          type="button"
           onClick={() => {
             setFailureSimRunning(true);
             setFailureSimStep(0);
@@ -51,18 +59,21 @@ export function FailureSimulatorPro() {
           ▶ Run Failure Simulation
         </button>
         <button
+          type="button"
           onClick={() => setFailureSimStep(Math.max(0, failureSimStep - 1))}
           className="px-2 py-1 text-[9px] text-slate-500 border border-slate-700/50 rounded"
         >
           ◀ Step
         </button>
         <button
+          type="button"
           onClick={() => setFailureSimStep(Math.min(FAILURE_CHAIN.length - 1, failureSimStep + 1))}
           className="px-2 py-1 text-[9px] text-slate-500 border border-slate-700/50 rounded"
         >
           Step ▶
         </button>
         <button
+          type="button"
           onClick={() => setFailureSimAuto(!failureSimAuto)}
           className={cn(
             'px-2 py-1 text-[9px] rounded border',
@@ -72,6 +83,7 @@ export function FailureSimulatorPro() {
           Auto
         </button>
         <button
+          type="button"
           onClick={() => { setFailureSimStep(0); setFailureSimRunning(false); }}
           className="px-2 py-1 text-[9px] text-slate-500 border border-slate-700/50 rounded"
         >
@@ -80,7 +92,7 @@ export function FailureSimulatorPro() {
       </div>
 
       {failureSimRunning && (
-        <div className="px-3 py-2 border-b border-red-500/10">
+        <div className="shrink-0 px-3 py-2 border-b border-red-500/10">
           <div className="flex items-center gap-1 flex-wrap">
             {FAILURE_CHAIN.map((step, i) => (
               <motion.div
@@ -103,16 +115,19 @@ export function FailureSimulatorPro() {
         </div>
       )}
 
-      <div className="flex-1 min-h-0">
-        <FailureSimulation />
-      </div>
-
-      {active && failureSimRunning && (
-        <GlassPanel className="mx-3 mb-2 p-2 border-red-500/20">
-          <p className="text-[10px] text-red-300 font-medium">{active.name} — Step: {FAILURE_CHAIN[failureSimStep]}</p>
-          <p className="text-[9px] text-slate-500 mt-0.5">{active.detectionStep}</p>
+      {active && (
+        <GlassPanel className="shrink-0 mx-3 mt-2 p-2 border-red-500/20">
+          <p className="text-[10px] text-red-300 font-medium">
+            {active.name}
+            {failureSimRunning ? ` — Step: ${FAILURE_CHAIN[failureSimStep]}` : ' — select Run to animate failure chain'}
+          </p>
+          <p className="text-[9px] text-slate-500 mt-0.5 line-clamp-2">{active.description}</p>
         </GlassPanel>
       )}
+
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <FailureSimulation />
+      </div>
     </div>
   );
 }

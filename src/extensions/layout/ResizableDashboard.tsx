@@ -2,6 +2,7 @@
 
 import { Group, Panel, Separator } from 'react-resizable-panels';
 import { useExtensionStore } from '../store/extensionStore';
+import { percentSize } from './panelSizing';
 
 interface ResizableDashboardProps {
   sidebar: React.ReactNode;
@@ -17,14 +18,14 @@ export function ResizableDashboard({ sidebar, main, inspector, commMonitor }: Re
 
   return (
     <div className="flex flex-1 min-h-0 relative">
-      <Group orientation="horizontal" id="vv-main-horizontal" className="flex-1 min-h-0">
+      <Group orientation="horizontal" id="vv-main-horizontal" className="flex-1 min-h-0 h-full w-full">
         {!panelLayout.sidebarCollapsed && (
           <>
             <Panel
               id="sidebar"
-              defaultSize={panelLayout.sidebarWidth}
-              minSize={8}
-              maxSize={30}
+              defaultSize={percentSize(panelLayout.sidebarWidth)}
+              minSize="8"
+              maxSize="30"
               onResize={(size) => setPanelSize('sidebarWidth', size.asPercentage)}
               className="min-w-0"
             >
@@ -33,9 +34,7 @@ export function ResizableDashboard({ sidebar, main, inspector, commMonitor }: Re
                 <div className="flex-1 min-h-0 overflow-hidden">{sidebar}</div>
               </div>
             </Panel>
-            <Separator className="w-1.5 bg-slate-800/30 hover:bg-cyan-500/10 transition-colors cursor-col-resize flex items-center justify-center">
-              <div className="w-0.5 h-8 rounded-full bg-slate-600" />
-            </Separator>
+            <ColSeparator />
           </>
         )}
 
@@ -43,24 +42,22 @@ export function ResizableDashboard({ sidebar, main, inspector, commMonitor }: Re
           <CollapsedBar label="ECU Tree" onExpand={() => togglePanelCollapse('sidebar')} side="left" />
         )}
 
-        <Panel id="center" minSize={40}>
-          <Group orientation="vertical" id="vv-main-vertical" className="h-full">
-            <Panel id="center-main" minSize={30}>
-              <Group orientation="horizontal" className="h-full">
-                <Panel id="canvas" minSize={35}>
+        <Panel id="center" minSize="40">
+          <Group orientation="vertical" id="vv-main-vertical" className="h-full w-full">
+            <Panel id="center-main" minSize="30">
+              <Group orientation="horizontal" className="h-full w-full">
+                <Panel id="canvas" minSize="35">
                   <div className="h-full min-w-0 relative">{main}</div>
                 </Panel>
 
                 {!panelLayout.inspectorCollapsed && (
                   <>
-                    <Separator className="w-1.5 bg-slate-800/30 hover:bg-cyan-500/10 cursor-col-resize flex items-center justify-center">
-                      <div className="w-0.5 h-8 rounded-full bg-slate-600" />
-                    </Separator>
+                    <ColSeparator />
                     <Panel
                       id="inspector"
-                      defaultSize={panelLayout.inspectorWidth}
-                      minSize={12}
-                      maxSize={35}
+                      defaultSize={percentSize(panelLayout.inspectorWidth)}
+                      minSize="12"
+                      maxSize="35"
                       onResize={(size) => setPanelSize('inspectorWidth', size.asPercentage)}
                     >
                       <div className="h-full flex flex-col border-l border-cyan-500/10 bg-slate-900/40">
@@ -75,14 +72,12 @@ export function ResizableDashboard({ sidebar, main, inspector, commMonitor }: Re
 
             {!panelLayout.commMonitorCollapsed && (
               <>
-                <Separator className="h-1.5 bg-slate-800/30 hover:bg-cyan-500/10 cursor-row-resize flex items-center justify-center">
-                  <div className="h-0.5 w-8 rounded-full bg-slate-600" />
-                </Separator>
+                <RowSeparator />
                 <Panel
                   id="comm-monitor"
-                  defaultSize={panelLayout.commMonitorHeight}
-                  minSize={8}
-                  maxSize={50}
+                  defaultSize={percentSize(panelLayout.commMonitorHeight)}
+                  minSize="8"
+                  maxSize="50"
                   onResize={(size) => setPanelSize('commMonitorHeight', size.asPercentage)}
                 >
                   <div className="h-full border-t border-cyan-500/10 flex flex-col min-h-0">
@@ -100,6 +95,22 @@ export function ResizableDashboard({ sidebar, main, inspector, commMonitor }: Re
         <CollapsedBar label="Comm Monitor" onExpand={() => togglePanelCollapse('commMonitor')} side="bottom" />
       )}
     </div>
+  );
+}
+
+function ColSeparator() {
+  return (
+    <Separator
+      className="w-2 shrink-0 bg-slate-800/50 hover:bg-cyan-500/20 active:bg-cyan-500/30 transition-colors cursor-col-resize"
+    />
+  );
+}
+
+function RowSeparator() {
+  return (
+    <Separator
+      className="h-2 shrink-0 bg-slate-800/50 hover:bg-cyan-500/20 active:bg-cyan-500/30 transition-colors cursor-row-resize"
+    />
   );
 }
 

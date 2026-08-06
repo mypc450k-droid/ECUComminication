@@ -13,7 +13,7 @@ export function ExplainWhyModal() {
 
   return (
     <AnimatePresence>
-      {content && (
+      {explainWhyKey && content && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
