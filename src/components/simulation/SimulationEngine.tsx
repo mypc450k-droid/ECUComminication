@@ -2,17 +2,15 @@
 
 import { useAppStore } from '@/lib/store';
 import { getSimulationFeature } from '@/lib/simulation-loader';
+import { SimulationAreaExtension } from '@/extensions/layout/SimulationAreaExtension';
+import { SimulationPlaybackExtension } from '@/extensions/playback/SimulationPlaybackExtension';
+import { FailureSimulatorPro } from '@/extensions/failure/FailureSimulatorPro';
+import { AutosarFeatureFlow } from '@/extensions/autosar/AutosarFeatureFlow';
 import { FeatureTabs } from './FeatureTabs';
-import { SimulationControls } from './SimulationControls';
 import { LearningModeSelector } from './LearningModeSelector';
-import { EngineeringCanvas } from './EngineeringCanvas';
-import { StepDetailPanel } from './StepDetailPanel';
 import { SimulationTimeline } from './SimulationTimeline';
-import { FailureSimulation } from './FailureSimulation';
 import { NetworkVisualizer } from './NetworkVisualizer';
 import { Topology3DView } from './Topology3DView';
-import { AutosarStackVisualizer } from './AutosarStackVisualizer';
-import { KnowledgePanel } from './KnowledgePanel';
 import { ExplainWhyModal } from './ExplainWhyModal';
 import { ShowMeMoreModal } from './ShowMeMoreModal';
 import { GlassPanel } from '@/components/ui/GlassPanel';
@@ -47,23 +45,15 @@ export function SimulationEngine() {
               <p className="text-[10px] text-slate-500">{feature.description}</p>
             </GlassPanel>
           </div>
-          <SimulationControls />
-          <div className="flex flex-1 min-h-0">
-            <EngineeringCanvas steps={feature.steps} involvedEcus={feature.involvedEcus} />
-            <div className="w-72 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col min-h-0">
-              <div className="flex-1 overflow-y-auto custom-scrollbar">
-                <StepDetailPanel step={currentStep} />
-              </div>
-              <KnowledgePanel feature={feature} />
-            </div>
-          </div>
+          <SimulationPlaybackExtension />
+          <SimulationAreaExtension feature={feature} currentStep={currentStep} />
           <SimulationTimeline steps={feature.steps} />
         </>
       )}
 
-      {featureTab === 'failure' && <FailureSimulation />}
+      {featureTab === 'failure' && <FailureSimulatorPro />}
       {featureTab === 'network' && <NetworkVisualizer />}
-      {featureTab === 'autosar-stack' && <AutosarStackVisualizer />}
+      {featureTab === 'autosar-stack' && <AutosarFeatureFlow feature={feature} />}
       {featureTab === 'topology3d' && <Topology3DView />}
 
       <ExplainWhyModal />
