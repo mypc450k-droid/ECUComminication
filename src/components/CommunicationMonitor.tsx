@@ -7,7 +7,7 @@ import { NetworkBadge } from './ui/Badges';
 import { PacketLane } from './simulation/PacketLane';
 import { cn } from '@/lib/utils';
 
-export function CommunicationMonitor() {
+export function CommunicationMonitor({ embedded = false }: { embedded?: boolean }) {
   const messages = useAppStore((s) => s.communicationMessages);
   const bottomPanelExpanded = useAppStore((s) => s.bottomPanelExpanded);
   const toggleBottomPanel = useAppStore((s) => s.toggleBottomPanel);
@@ -20,7 +20,7 @@ export function CommunicationMonitor() {
   return (
     <div className={cn(
       'border-t border-cyan-500/10 bg-slate-900/60 transition-all duration-300',
-      bottomPanelExpanded ? 'h-44' : 'h-8'
+      embedded ? 'h-full' : bottomPanelExpanded ? 'h-44' : 'h-8'
     )}>
       <div
         className="flex items-center justify-between px-4 h-8 border-b border-cyan-500/10 cursor-pointer hover:bg-cyan-500/5"
@@ -72,6 +72,7 @@ export function CommunicationMonitor() {
                     {messages.map((msg, i) => (
                       <motion.tr
                         key={msg.id}
+                        data-packet-id={msg.id}
                         initial={{ opacity: 0, x: -20, backgroundColor: 'rgba(0,212,255,0.1)' }}
                         animate={{ opacity: 1, x: 0, backgroundColor: 'transparent' }}
                         exit={{ opacity: 0 }}
