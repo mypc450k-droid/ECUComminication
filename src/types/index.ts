@@ -112,7 +112,7 @@ export interface SidebarItem {
   icon?: string;
 }
 
-export type ViewMode = 'architecture' | 'autosar' | 'feature';
+export type ViewMode = 'architecture' | 'autosar' | 'feature' | 'network' | 'topology3d';
 
 export interface AppState {
   selectedEcuId: string | null;

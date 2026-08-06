@@ -1,0 +1,326 @@
+{
+  "com": {
+    "key": "com",
+    "title": "Why COM?",
+    "purpose": "COM (Communication) is the AUTOSAR module that maps application signals to Protocol Data Units (PDUs) for transmission across vehicle networks.",
+    "responsibilities": [
+      "Pack signals into PDU byte arrays for transmission",
+      "Unpack received PDUs into individual signals",
+      "Monitor signal timeouts and update bits",
+      "Apply signal filters and conversion formulas"
+    ],
+    "realWorldExample": "When BCM sends a window position command, COM packs the 8-bit position value and direction bit into byte 0 of PDU 0x245.",
+    "analogy": "COM is like a postal clerk who puts your letter (signal) into the correct envelope (PDU) with the right address (CAN ID).",
+    "oemExample": "Mercedes-Benz uses Vector DaVinci Configurator to define COM signal-to-PDU mappings in ARXML for all body domain ECUs.",
+    "interviewQuestions": [
+      "What is the difference between COM and PduR?",
+      "How does COM handle signal timeout?",
+      "What is an update bit in AUTOSAR COM?",
+      "How are signals packed into PDUs?"
+    ],
+    "commonMistakes": [
+      "Confusing COM with CAN driver — COM never touches hardware",
+      "Forgetting endianness when packing multi-byte signals",
+      "Not configuring transfer properties (triggered vs cyclic)"
+    ],
+    "vectorTools": ["CANoe", "DaVinci Configurator", "CANalyzer"],
+    "debuggingMethod": "Use CANoe to trace PDU contents, compare with COM configuration in DaVinci, verify signal packing with CANdb++"
+  },
+  "rte": {
+    "key": "rte",
+    "title": "Why RTE?",
+    "purpose": "The Runtime Environment (RTE) is the glue between Software Components (SWCs) and Basic Software (BSW), providing port-based communication.",
+    "responsibilities": [
+      "Connect sender ports to receiver ports within and across ECUs",
+      "Trigger runnable entities based on data reception or timing",
+      "Abstract inter-ECU communication from SWC developers",
+      "Manage mode switches and NvM access"
+    ],
+    "realWorldExample": "When WindowControl SWC writes to its sender port, RTE routes the data to COM for transmission or to a local receiver port.",
+    "analogy": "RTE is like a telephone switchboard connecting callers (SWCs) without them needing to know each other's phone numbers.",
+    "oemExample": "BMW uses ETAS RTA-RTE generated from ARXML for all powertrain ECUs on AURIX platforms.",
+    "interviewQuestions": [
+      "What is the difference between RTE and OS?",
+      "How does RTE handle inter-ECU communication?",
+      "What triggers a runnable in AUTOSAR?",
+      "What is SchM vs RTE?"
+    ],
+    "commonMistakes": [
+      "Calling BSW APIs directly from SWC instead of through RTE",
+      "Not understanding implicit vs explicit communication",
+      "Ignoring RTE generation errors in build"
+    ],
+    "vectorTools": ["DaVinci Developer", "CANoe"],
+    "debuggingMethod": "Enable RTE trace in DaVinci Developer, use OS task trace to verify runnable scheduling"
+  },
+  "gateway": {
+    "key": "gateway",
+    "title": "Why Gateway?",
+    "purpose": "The Gateway ECU routes messages between different vehicle networks (CAN, LIN, Ethernet) and enforces security policies.",
+    "responsibilities": [
+      "Route PDUs between network domains based on routing tables",
+      "Act as firewall between safety-critical and comfort networks",
+      "Translate between protocols (CAN to Ethernet)",
+      "Manage network wake-up and sleep coordination"
+    ],
+    "realWorldExample": "When Door ECU sends a LIN message, Gateway converts and forwards it as CAN 0x245 to BCM on the body CAN bus.",
+    "analogy": "Gateway is like an airport hub — flights (messages) from different terminals (networks) are routed to their destinations.",
+    "oemExample": "Continental Gateway ECU in VW MQB platform routes 2000+ messages between 5 CAN buses and Ethernet backbone.",
+    "interviewQuestions": [
+      "Why do vehicles need a Gateway ECU?",
+      "How does Gateway routing table work?",
+      "What is SecOC in Gateway context?",
+      "Gateway vs simple CAN bridge?"
+    ],
+    "commonMistakes": [
+      "Assuming all ECUs can communicate directly",
+      "Not accounting for Gateway latency in timing analysis",
+      "Missing routing entries causing silent message drops"
+    ],
+    "vectorTools": ["CANoe", "vTESTstudio", "DaVinci Configurator"],
+    "debuggingMethod": "Trace messages on both sides of Gateway in CANoe, verify routing table in Gateway configuration"
+  },
+  "can": {
+    "key": "can",
+    "title": "Why CAN?",
+    "purpose": "CAN (Controller Area Network) is the primary vehicle bus protocol for real-time ECU communication with deterministic arbitration.",
+    "responsibilities": [
+      "Multi-master bus with priority-based arbitration",
+      "Error detection and fault confinement",
+      "500 kbps (HS) or 125 kbps (LS) data rates",
+      "Broadcast communication to all bus participants"
+    ],
+    "realWorldExample": "BCM broadcasts CAN ID 0x245 every 100ms with window command — all ECUs on the bus see it, only Door ECU acts on it.",
+    "analogy": "CAN is like a group chat where everyone hears everything, but only the person addressed responds.",
+    "oemExample": "Bosch Engine ECU transmits engine speed on CAN 0x0C0 at 10ms cycle time on all European OEM platforms.",
+    "interviewQuestions": [
+      "CAN vs LIN — when to use each?",
+      "What is CAN bus-off state?",
+      "How does CAN arbitration work?",
+      "CAN 2.0 vs CAN FD differences?"
+    ],
+    "commonMistakes": [
+      "Wrong termination resistor causing reflection",
+      "Exceeding bus load budget (>70%)",
+      "Using wrong baud rate on mixed network"
+    ],
+    "vectorTools": ["CANoe", "CANalyzer", "vCAN"],
+    "debuggingMethod": "Measure bus load with CANoe, check termination with oscilloscope, verify timing with CAN trace"
+  },
+  "lin": {
+    "key": "lin",
+    "title": "Why LIN?",
+    "purpose": "LIN (Local Interconnect Network) is a low-cost single-wire bus for connecting simple sensors and actuators to a LIN master.",
+    "responsibilities": [
+      "Master-slave topology with schedule table",
+      "19.2 kbps single-wire communication",
+      "Cost-effective alternative to CAN for door modules",
+      "Diagnostic support via LIN diagnostic frames"
+    ],
+    "realWorldExample": "BCM as LIN master polls Door ECU every 10ms for switch status using schedule table frame 0x3A.",
+    "analogy": "LIN is like a teacher (master) calling on students (slaves) one at a time in a fixed order (schedule table).",
+    "oemExample": "Brose Door ECU modules in Ford F-150 use LIN for window switch and lock actuator communication.",
+    "interviewQuestions": [
+      "LIN master vs slave responsibilities?",
+      "What is a LIN schedule table?",
+      "LIN diagnostic vs UDS on CAN?",
+      "Maximum LIN nodes per bus?"
+    ],
+    "commonMistakes": [
+      "LIN slave responding outside schedule slot",
+      "Missing LIN transceiver supply voltage",
+      "Confusing LIN schedule with CAN cyclic transmission"
+    ],
+    "vectorTools": ["CANoe (LIN option)", "DaVinci Configurator"],
+    "debuggingMethod": "Use CANoe LIN trace to verify schedule table timing and slave responses"
+  },
+  "autosar": {
+    "key": "autosar",
+    "title": "Why AUTOSAR?",
+    "purpose": "AUTOSAR standardizes automotive software architecture enabling portability, reuse, and supplier interoperability.",
+    "responsibilities": [
+      "Define layered software architecture (App, RTE, BSW, MCAL)",
+      "Standardize communication interfaces across ECUs",
+      "Enable tool-chain automation (code generation)",
+      "Support safety (ISO 26262) and security requirements"
+    ],
+    "realWorldExample": "Continental BCM firmware uses AUTOSAR Classic with 15 SWCs, generated RTE, and Vector CAN stack on AURIX TC3xx.",
+    "analogy": "AUTOSAR is like building codes for software — everyone builds to the same standard so components fit together.",
+    "oemExample": "Mercedes-Benz MB.OS uses AUTOSAR Classic for all body ECUs and Adaptive for ADAS domain controllers.",
+    "interviewQuestions": [
+      "AUTOSAR Classic vs Adaptive differences?",
+      "What is ARXML?",
+      "How is RTE generated?",
+      "AUTOSAR and ISO 26262 relationship?"
+    ],
+    "commonMistakes": [
+      "Mixing Classic and Adaptive concepts",
+      "Manual BSW configuration instead of tool-generated",
+      "Ignoring memory section requirements"
+    ],
+    "vectorTools": ["DaVinci Configurator", "DaVinci Developer", "CANoe"],
+    "debuggingMethod": "Use DaVinci tools for configuration validation, CANoe for integration testing"
+  },
+  "pdur": {
+    "key": "pdur",
+    "title": "Why PduR?",
+    "purpose": "PduR (PDU Router) routes Protocol Data Units between upper communication layers and lower bus interface modules.",
+    "responsibilities": [
+      "Route PDUs from COM to CanIf, LinIf, or SoAd",
+      "Gateway PDUs between different bus types",
+      "Multiplex transport protocol sessions",
+      "Buffer management for multi-frame transfers"
+    ],
+    "realWorldExample": "PduR receives PDU from COM layer and routes it to CanIf for CAN transmission based on routing path configuration.",
+    "analogy": "PduR is like a mail sorting facility routing packages to the correct delivery truck (bus interface).",
+    "oemExample": "ZF Gateway ECU PduR routes 500+ PDU paths between 4 CAN interfaces and Ethernet.",
+    "interviewQuestions": [
+      "PduR vs COM responsibilities?",
+      "How does PduR gateway work?",
+      "What is a routing path in PduR?",
+      "PduR and CanTp relationship?"
+    ],
+    "commonMistakes": [
+      "Missing routing path causing PDU not transmitted",
+      "Wrong PDU ID mapping in routing table",
+      "Not configuring gateway buffering"
+    ],
+    "vectorTools": ["DaVinci Configurator", "CANoe"],
+    "debuggingMethod": "Trace PDU flow through PduR callbacks in CANoe, verify routing paths in ARXML"
+  },
+  "canif": {
+    "key": "canif",
+    "title": "Why CanIf?",
+    "purpose": "CanIf (CAN Interface) abstracts the CAN controller hardware providing uniform access for upper layers.",
+    "responsibilities": [
+      "Map PDUs to Hardware Transmit Handles (HTH) and Receive Handles (HRH)",
+      "Handle transmit confirmations and receive indications",
+      "Manage controller mode (START, STOP, SLEEP)",
+      "Coordinate bus-off recovery with CanSM"
+    ],
+    "realWorldExample": "CanIf maps PDU 0x245 to HTH 3 on CAN controller 0, triggering transmission when PduR calls CanIf_Transmit.",
+    "analogy": "CanIf is like a USB driver — it translates software requests into hardware register operations.",
+    "oemExample": "Vector MICROSAR CanIf on Infineon AURIX supports 64 HTH/HRH per controller.",
+    "interviewQuestions": [
+      "CanIf vs CanDrv difference?",
+      "What is HTH and HRH?",
+      "How does CanIf handle bus-off?",
+      "CanIf and CanSM interaction?"
+    ],
+    "commonMistakes": [
+      "Wrong HTH/HRH configuration",
+      "Not handling transmit confirmation",
+      "Ignoring CanSM mode requests"
+    ],
+    "vectorTools": ["DaVinci Configurator", "CANoe", "Trace32"],
+    "debuggingMethod": "Use Trace32 to verify CanIf register access, CANoe for frame-level verification"
+  },
+  "nvm": {
+    "key": "nvm",
+    "title": "Why NvM?",
+    "purpose": "NvM (NVRAM Manager) manages non-volatile data storage for persistent configuration and learned values.",
+    "responsibilities": [
+      "Store and retrieve data blocks from EEPROM/Flash",
+      "Manage write counters and wear leveling",
+      "Provide redundant storage for critical data",
+      "Coordinate with Fee (Flash EEPROM Emulation)"
+    ],
+    "realWorldExample": "NvM stores seat position memory and window anti-pinch learned values across power cycles.",
+    "analogy": "NvM is like a save file system — it remembers settings even when the game (ECU) is turned off.",
+    "oemExample": "Bosch BCM uses NvM for 50+ blocks including mirror positions, window limits, and personalization data.",
+    "interviewQuestions": [
+      "NvM vs direct EEPROM access?",
+      "What is NvM block management?",
+      "How does NvM handle power loss during write?",
+      "NvM and Fee relationship?"
+    ],
+    "commonMistakes": [
+      "Writing NvM blocks too frequently causing wear",
+      "Not waiting for NvM write completion",
+      "Missing redundant block configuration for safety data"
+    ],
+    "vectorTools": ["DaVinci Configurator", "Trace32"],
+    "debuggingMethod": "Monitor NvM job status via UDS, verify block contents with debugger"
+  },
+  "mcal": {
+    "key": "mcal",
+    "title": "Why MCAL?",
+    "purpose": "MCAL (Microcontroller Abstraction Layer) provides hardware-independent drivers for MCU peripherals.",
+    "responsibilities": [
+      "GPIO, ADC, PWM, SPI, I2C peripheral drivers",
+      "Clock and power management configuration",
+      "Interrupt and DMA handling",
+      "Hardware register abstraction"
+    ],
+    "realWorldExample": "MCAL PWM driver sets duty cycle on pin P14.0 to control window motor H-bridge at 20kHz.",
+    "analogy": "MCAL is like device drivers on your computer — they let software talk to hardware without knowing chip details.",
+    "oemExample": "Infineon iLLD/EB tresos MCAL for AURIX TC3xx used by Continental, Bosch, and ZF.",
+    "interviewQuestions": [
+      "MCAL vs BSW driver difference?",
+      "What peripherals does MCAL cover?",
+      "How is MCAL configured?",
+      "MCAL and portability?"
+    ],
+    "commonMistakes": [
+      "Direct register access bypassing MCAL",
+      "Wrong pin mux configuration",
+      "Interrupt priority conflicts"
+    ],
+    "vectorTools": ["EB tresos", "Trace32", "UDE"],
+    "debuggingMethod": "Use debugger to verify MCAL register settings, oscilloscope for PWM/ADC verification"
+  },
+  "ecu": {
+    "key": "ecu",
+    "title": "Why ECU?",
+    "purpose": "Electronic Control Units are dedicated embedded computers that control specific vehicle functions.",
+    "responsibilities": [
+      "Execute application software for a vehicle domain",
+      "Communicate with other ECUs via vehicle networks",
+      "Interface with sensors and actuators",
+      "Report diagnostics and store DTCs"
+    ],
+    "realWorldExample": "Door ECU reads window switch, communicates via LIN to BCM, and drives window motor via PWM output.",
+    "analogy": "Each ECU is like a specialist employee — the door expert handles doors, the engine expert handles engine, they coordinate via meetings (bus communication).",
+    "oemExample": "Modern vehicles have 80-150 ECUs; a Mercedes S-Class has over 100 ECUs across all domains.",
+    "interviewQuestions": [
+      "How many ECUs in a modern vehicle?",
+      "ECU power modes and network management?",
+      "How do ECUs wake up from sleep?",
+      "ECU supplier vs OEM responsibilities?"
+    ],
+    "commonMistakes": [
+      "Assuming one ECU controls everything",
+      "Ignoring ECU sleep/wake timing",
+      "Not considering ECU boot time in feature timing"
+    ],
+    "vectorTools": ["CANoe", "DaVinci", "Trace32"],
+    "debuggingMethod": "Use CANoe for network analysis, debugger for ECU internal state, UDS for diagnostics"
+  },
+  "swc": {
+    "key": "swc",
+    "title": "Why Application SWC?",
+    "purpose": "Software Components (SWCs) implement vehicle feature logic as modular, reusable application software units.",
+    "responsibilities": [
+      "Implement feature algorithms and state machines",
+      "Define sender/receiver ports for communication",
+      "Contain runnable entities triggered by events or timing",
+      "Report diagnostic events to DEM"
+    ],
+    "realWorldExample": "WindowControl SWC reads switch input, validates request, and outputs motor command via sender port.",
+    "analogy": "SWC is like a module in a software project — self-contained with defined inputs and outputs.",
+    "oemExample": "Continental BCM contains 15 SWCs: LightControl, LockControl, WindowControl, WiperControl, etc.",
+    "interviewQuestions": [
+      "SWC vs traditional module difference?",
+      "What is a runnable in AUTOSAR?",
+      "How do SWCs communicate?",
+      "SWC port types?"
+    ],
+    "commonMistakes": [
+      "Putting hardware access directly in SWC",
+      "Too many runnables causing scheduling issues",
+      "Not following port interface contracts"
+    ],
+    "vectorTools": ["DaVinci Developer", "CANoe"],
+    "debuggingMethod": "Trace SWC runnable execution via OS trace, verify port data in debugger"
+  }
+}

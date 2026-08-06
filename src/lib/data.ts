@@ -4,6 +4,7 @@ import featuresData from '@/data/features.json';
 import autosarData from '@/data/autosar.json';
 import sidebarData from '@/data/sidebar.json';
 import type { ECU, Network, Feature, AutosarLayer, SidebarItem } from '@/types';
+import { getSimulationFeature } from './simulation-loader';
 
 export const ecus: ECU[] = ecusData as ECU[];
 export const networks: Network[] = networksData as Network[];
@@ -57,19 +58,36 @@ export function searchAll(query: string): {
     )
     .map((f) => f.id);
 
+  // Also search simulation steps and CAN IDs
+  const simFeatureIds = features
+    .filter((f) => {
+      const sim = getSimulationFeature(f.id);
+      if (!sim) return false;
+      return sim.steps.some(
+        (s) =>
+          s.title.toLowerCase().includes(q) ||
+          s.canId?.toLowerCase().includes(q) ||
+          s.signalName?.toLowerCase().includes(q) ||
+          s.type.toLowerCase().includes(q)
+      );
+    })
+    .map((f) => f.id);
+
+  const allFeatureIds = [...new Set([...featureIds, ...simFeatureIds])];
+
   const networkIds = networks
     .filter((n) => n.name.toLowerCase().includes(q) || n.type.toLowerCase().includes(q))
     .map((n) => n.id);
 
   // When features match, also highlight their involved ECUs and networks
   const featureInvolvedEcuIds = features
-    .filter((f) => featureIds.includes(f.id))
+    .filter((f) => allFeatureIds.includes(f.id))
     .flatMap((f) => f.involvedEcus);
 
   const featureInvolvedNetworkIds = networks
     .filter((n) =>
       features
-        .filter((f) => featureIds.includes(f.id))
+        .filter((f) => allFeatureIds.includes(f.id))
         .some((f) => f.involvedNetworks.includes(n.type))
     )
     .map((n) => n.id);
@@ -77,5 +95,5 @@ export function searchAll(query: string): {
   const allEcuIds = [...new Set([...ecuIds, ...featureInvolvedEcuIds])];
   const allNetworkIds = [...new Set([...networkIds, ...featureInvolvedNetworkIds])];
 
-  return { ecuIds: allEcuIds, featureIds, networkIds: allNetworkIds };
+  return { ecuIds: allEcuIds, featureIds: allFeatureIds, networkIds: allNetworkIds };
 }

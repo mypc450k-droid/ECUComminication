@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore, startCommunicationTicker, stopCommunicationTicker } from '@/lib/store';
 import { NetworkBadge } from './ui/Badges';
+import { PacketLane } from './simulation/PacketLane';
 import { cn } from '@/lib/utils';
 
 export function CommunicationMonitor() {
@@ -50,9 +51,10 @@ export function CommunicationMonitor() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="h-[calc(100%-32px)] overflow-hidden"
+            className="h-[calc(100%-32px)] overflow-hidden flex flex-col"
           >
-            <div className="h-full overflow-y-auto custom-scrollbar">
+            <PacketLane messages={messages} />
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
               <table className="w-full text-left">
                 <thead className="sticky top-0 bg-slate-900/90 z-10">
                   <tr className="text-[9px] font-semibold text-slate-500 uppercase tracking-wider">

@@ -7,10 +7,12 @@ export function HeaderBar() {
   const viewMode = useAppStore((s) => s.viewMode);
   const selectedFeatureId = useAppStore((s) => s.selectedFeatureId);
 
-  const modeLabels = {
+  const modeLabels: Record<string, string> = {
     architecture: 'Vehicle Architecture',
     autosar: 'AUTOSAR Explorer',
     feature: 'Feature Simulation',
+    network: 'Network Visualizer',
+    topology3d: '3D Topology',
   };
 
   return (

@@ -113,6 +113,7 @@ export function Sidebar() {
   const searchQuery = useAppStore((s) => s.searchQuery);
   const setSearchQuery = useAppStore((s) => s.setSearchQuery);
   const setHighlightedIds = useAppStore((s) => s.setHighlightedIds);
+  const selectFeature = useAppStore((s) => s.selectFeature);
   const [localQuery, setLocalQuery] = useState(searchQuery);
 
   const handleSearch = useCallback(
@@ -123,11 +124,14 @@ export function Sidebar() {
         const results = searchAll(value);
         const ids = [...results.ecuIds, ...results.featureIds, ...results.networkIds];
         setHighlightedIds(ids);
+        if (results.featureIds.length > 0) {
+          selectFeature(results.featureIds[0]);
+        }
       } else {
         setHighlightedIds([]);
       }
     },
-    [setSearchQuery, setHighlightedIds]
+    [setSearchQuery, setHighlightedIds, selectFeature]
   );
 
   useEffect(() => {
