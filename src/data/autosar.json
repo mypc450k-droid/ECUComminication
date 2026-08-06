@@ -1,0 +1,155 @@
+[
+  {
+    "id": "app-layer",
+    "name": "Application Layer",
+    "shortName": "App SWC",
+    "purpose": "Implements vehicle feature logic as Software Components (SWCs) with defined ports and runnables.",
+    "responsibilities": [
+      "Feature algorithm implementation",
+      "State machine management",
+      "Signal processing and validation",
+      "Diagnostic event reporting"
+    ],
+    "inputs": ["Sensor signals via receiver ports", "Mode manager requests", "Diagnostic commands"],
+    "outputs": ["Actuator commands via sender ports", "Status signals", "DTC events"],
+    "configuration": ["SWC description (ARXML)", "Port interfaces", "Runnable entities", "Memory sections"],
+    "relatedModules": ["RTE", "Dem", "NvM", "EcuM"],
+    "order": 0
+  },
+  {
+    "id": "rte",
+    "name": "Runtime Environment",
+    "shortName": "RTE",
+    "purpose": "Provides the communication layer between SWCs and BSW modules, abstracting hardware dependencies.",
+    "responsibilities": [
+      "SWC port communication",
+      "Runnable scheduling triggers",
+      "Inter-ECU communication abstraction",
+      "Mode switch management"
+    ],
+    "inputs": ["Sender port data", "BSW callbacks", "Mode switch notifications"],
+    "outputs": ["Receiver port data", "Runnable activations", "COM signal writes"],
+    "configuration": ["RTE generation from ARXML", "Task mapping", "Event-to-task mapping"],
+    "relatedModules": ["OS", "COM", "SchM", "EcuM"],
+    "order": 1
+  },
+  {
+    "id": "com",
+    "name": "Communication Stack",
+    "shortName": "COM",
+    "purpose": "Signal-based communication layer mapping application signals to PDU payloads.",
+    "responsibilities": [
+      "Signal packing and unpacking",
+      "Signal filtering and timeout monitoring",
+      "Update-bit management",
+      "Group signal handling"
+    ],
+    "inputs": ["RTE signal writes", "PduR indication callbacks"],
+    "outputs": ["RTE signal reads", "PduR transmit requests"],
+    "configuration": ["Signal definitions", "PDU mappings", "Transfer properties", "Filters"],
+    "relatedModules": ["PduR", "RTE", "SecOC"],
+    "order": 2
+  },
+  {
+    "id": "pdur",
+    "name": "PDU Router",
+    "shortName": "PduR",
+    "purpose": "Routes Protocol Data Units between upper communication layers and lower bus interfaces.",
+    "responsibilities": [
+      "PDU routing table management",
+      "Gateway functionality",
+      "Multi-destination routing",
+      "Transport protocol multiplexing"
+    ],
+    "inputs": ["COM transmit requests", "Interface indications"],
+    "outputs": ["Interface transmit calls", "COM receive indications"],
+    "configuration": ["Routing paths", "PDU IDs", "Gateway mappings"],
+    "relatedModules": ["COM", "CanIf", "LinIf", "SoAd"],
+    "order": 3
+  },
+  {
+    "id": "canif",
+    "name": "CAN Interface",
+    "shortName": "CanIf",
+    "purpose": "Abstracts CAN controller hardware providing uniform access for upper layers.",
+    "responsibilities": [
+      "Hardware object management (HTH/HRH)",
+      "PDU to CAN ID mapping",
+      "Transmit confirmation handling",
+      "Bus-off recovery coordination"
+    ],
+    "inputs": ["PduR transmit requests", "CanDrv receive indications"],
+    "outputs": ["CanDrv transmit calls", "PduR receive indications"],
+    "configuration": ["Hardware object config", "PDU to CAN ID mapping", "Controller config"],
+    "relatedModules": ["PduR", "CanDrv", "CanSM", "CanTp"],
+    "order": 4
+  },
+  {
+    "id": "candrv",
+    "name": "CAN Driver",
+    "shortName": "CanDrv",
+    "purpose": "Low-level CAN controller driver implementing AUTOSAR CAN driver specification.",
+    "responsibilities": [
+      "CAN frame transmission",
+      "CAN frame reception",
+      "Controller initialization",
+      "Interrupt handling"
+    ],
+    "inputs": ["CanIf transmit requests", "Hardware interrupts"],
+    "outputs": ["CanIf receive indications", "Hardware register writes"],
+    "configuration": ["Controller parameters", "Baud rate", "Filter configuration"],
+    "relatedModules": ["CanIf", "MCAL", "EcuM"],
+    "order": 5
+  },
+  {
+    "id": "mcal",
+    "name": "Microcontroller Abstraction Layer",
+    "shortName": "MCAL",
+    "purpose": "Hardware abstraction for microcontroller peripherals used by BSW drivers.",
+    "responsibilities": [
+      "GPIO configuration",
+      "Timer and PWM control",
+      "ADC/DAC access",
+      "SPI/I2C peripheral drivers"
+    ],
+    "inputs": ["Driver layer requests", "Hardware register reads"],
+    "outputs": ["Peripheral control signals", "Converted sensor values"],
+    "configuration": ["Pin mux configuration", "Clock settings", "Peripheral parameters"],
+    "relatedModules": ["CanDrv", "LinDrv", "Adc", "Dio", "Pwm"],
+    "order": 6
+  },
+  {
+    "id": "can-controller",
+    "name": "CAN Controller",
+    "shortName": "CAN Ctrl",
+    "purpose": "On-chip CAN controller hardware implementing CAN 2.0B protocol.",
+    "responsibilities": [
+      "Bit timing and arbitration",
+      "Error detection and handling",
+      "Message buffering",
+      "Bus error state management"
+    ],
+    "inputs": ["MCAL register writes", "CAN bus electrical signals"],
+    "outputs": ["MCAL register reads", "CAN bus electrical signals"],
+    "configuration": ["Bit timing registers", "Acceptance filters", "Interrupt enables"],
+    "relatedModules": ["MCAL", "Transceiver"],
+    "order": 7
+  },
+  {
+    "id": "transceiver",
+    "name": "CAN Transceiver",
+    "shortName": "Trcv",
+    "purpose": "Physical layer interface between CAN controller and vehicle bus wiring.",
+    "responsibilities": [
+      "Logic to differential signal conversion",
+      "Bus wake-up detection",
+      "Standby and sleep mode control",
+      "Bus fault protection"
+    ],
+    "inputs": ["CAN controller TX pin", "Bus wake-up signal"],
+    "outputs": ["CAN controller RX pin", "CAN_H/CAN_L bus signals"],
+    "configuration": ["Operating mode", "Wake-up source", "Slew rate"],
+    "relatedModules": ["CAN Controller", "CanTrcv"],
+    "order": 8
+  }
+]
