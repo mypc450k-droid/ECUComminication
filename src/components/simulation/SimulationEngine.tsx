@@ -33,13 +33,13 @@ export function SimulationEngine() {
   const currentStep = currentStepIndex >= 0 ? feature.steps[currentStepIndex] : null;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0">
       <FeatureTabs />
       <LearningModeSelector />
 
       {featureTab === 'simulation' && (
-        <>
-          <div className="px-3 py-2 border-b border-cyan-500/10">
+        <div className="flex flex-col flex-1 min-h-0">
+          <div className="px-3 py-2 border-b border-cyan-500/10 shrink-0">
             <GlassPanel className="px-3 py-2">
               <h2 className="text-sm font-semibold text-slate-100">{feature.name}</h2>
               <p className="text-[10px] text-slate-500">{feature.description}</p>
@@ -48,13 +48,29 @@ export function SimulationEngine() {
           <SimulationPlaybackExtension />
           <SimulationAreaExtension feature={feature} currentStep={currentStep} />
           <SimulationTimeline steps={feature.steps} />
-        </>
+        </div>
       )}
 
-      {featureTab === 'failure' && <FailureSimulatorPro />}
-      {featureTab === 'network' && <NetworkVisualizer />}
-      {featureTab === 'autosar-stack' && <AutosarFeatureFlow feature={feature} />}
-      {featureTab === 'topology3d' && <Topology3DView />}
+      {featureTab === 'failure' && (
+        <div className="flex-1 min-h-0">
+          <FailureSimulatorPro />
+        </div>
+      )}
+      {featureTab === 'network' && (
+        <div className="flex-1 min-h-0">
+          <NetworkVisualizer />
+        </div>
+      )}
+      {featureTab === 'autosar-stack' && (
+        <div className="flex-1 min-h-0">
+          <AutosarFeatureFlow feature={feature} />
+        </div>
+      )}
+      {featureTab === 'topology3d' && (
+        <div className="flex-1 min-h-0">
+          <Topology3DView />
+        </div>
+      )}
 
       <ExplainWhyModal />
       <ShowMeMoreModal />
