@@ -57,7 +57,24 @@ src/
 └── types/                  # TypeScript definitions
 ```
 
-## Future Integration Points
+## Simulation Engine (v2)
+
+Guided step-by-step engineering simulations with:
+
+- **Playback controls** — Previous, Next, Play, Pause, Restart, Auto Play, Skip To End, 0.5x/1x/2x speed
+- **Engineering Canvas** — Infinite zoom, pan, mini-map, ECU state visualization
+- **Step detail panel** — Beginner/Intermediate/Expert explanations, CAN frames, signal data
+- **Explain Why** — Purpose, analogy, OEM examples, interview questions, Vector tools
+- **Show Me More** — Architecture, signals, DTCs, failure modes, ISO 26262 impact
+- **Failure Injection** — 15 fault scenarios with DEM/DTC/recovery animation
+- **Network Visualizer** — Physical topology with animated packets
+- **3D Topology View** — Floating ECUs with glowing connections
+- **AUTOSAR Stack Visualizer** — Interactive layer explorer with APIs
+- **Timeline** — Step progress with click-to-jump navigation
+- **Knowledge Panel** — Interview questions, OEM notes, real vehicle examples
+- **Animated CAN Monitor** — Color-coded traveling packets by network type
+
+Simulation data is JSON-driven in `src/data/simulations/` — add a new feature by creating one JSON file.
 
 Architecture supports future modules without rewrites:
 
