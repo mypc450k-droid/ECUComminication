@@ -1,4 +1,4 @@
-import type { Feature, FlowStage } from '@/types';
+import type { Feature, FlowStage, NetworkType } from '@/types';
 import type { SimulationFeature, SimulationStep, ECUState } from '@/types/simulation';
 import powerWindowSim from '@/data/simulations/power-window.json';
 import explainWhyData from '@/data/knowledge/explain-why.json';
@@ -77,9 +77,47 @@ function generateEngineeringExplanation(stage: FlowStage): string {
   return stage.description;
 }
 
+function inferNetwork(stage: FlowStage, feature: Feature): NetworkType {
+  const desc = stage.description.toLowerCase();
+  const name = stage.name.toLowerCase();
+  if (stage.type === 'lin') return 'LIN';
+  if (desc.includes('ethernet') || name.includes('ethernet') || desc.includes('someip')) return 'Ethernet';
+  if (desc.includes('flexray')) return 'FlexRay';
+  if (feature.involvedNetworks.includes('Ethernet') && (stage.type === 'com' || stage.type === 'bus')) {
+    return 'Ethernet';
+  }
+  if (feature.involvedNetworks.includes('CAN_HS')) return 'CAN_HS';
+  if (feature.involvedNetworks.includes('CAN_LS')) return 'CAN_LS';
+  return feature.involvedNetworks[0];
+}
+
+const typeToAutosarLayer: Record<string, string> = {
+  swc: 'app-layer',
+  port: 'rte',
+  rte: 'rte',
+  com: 'com',
+  pdur: 'pdur',
+  canif: 'canif',
+  candrv: 'candrv',
+  mcal: 'mcal',
+  controller: 'can-controller',
+  bus: 'bus',
+  autosar: 'com',
+};
+
+function inferCanId(description: string): string | undefined {
+  const match = description.match(/0x[0-9A-Fa-f]{2,4}/);
+  return match ? match[0] : undefined;
+}
+
 function convertFlowStageToStep(stage: FlowStage, index: number, feature: Feature): SimulationStep {
   const explainKey = typeToExplainKey[stage.type] || stage.type;
   const ecu = stage.ecuId ? feature.involvedEcus.includes(stage.ecuId) ? stage.ecuId : undefined : undefined;
+  const network = inferNetwork(stage, feature);
+  const canId = inferCanId(stage.description);
+
+  const prevEcu = index > 0 ? feature.flowStages[index - 1]?.ecuId : undefined;
+  const nextEcu = index < feature.flowStages.length - 1 ? feature.flowStages[index + 1]?.ecuId : undefined;
 
   return {
     id: stage.id,
@@ -89,12 +127,15 @@ function convertFlowStageToStep(stage: FlowStage, index: number, feature: Featur
     beginnerExplanation: generateBeginnerExplanation(stage),
     engineeringExplanation: generateEngineeringExplanation(stage),
     ecuId: stage.ecuId || ecu,
-    network: feature.involvedNetworks[0],
-    autosarLayerId: stage.type === 'com' ? 'com' : stage.type === 'rte' ? 'rte' : stage.type === 'pdur' ? 'pdur' : stage.type === 'canif' || stage.type === 'candrv' ? 'canif' : stage.type === 'mcal' ? 'mcal' : undefined,
+    network,
+    autosarLayerId: typeToAutosarLayer[stage.type],
     ecuState: typeToEcuState[stage.type],
     executionTimeMs: stage.duration,
     explainWhyKey: explainKey,
     showMeMoreKey: stage.ecuId || explainKey,
+    canId,
+    sender: stage.ecuId || prevEcu || feature.involvedEcus[0],
+    receiver: nextEcu || stage.ecuId || feature.involvedEcus[feature.involvedEcus.length - 1],
     canvasPosition: { x: 60 + (index % 6) * 130, y: 50 + Math.floor(index / 6) * 100 },
   };
 }

@@ -380,20 +380,6 @@ export function InteractiveEngineeringCanvas({
         </div>
       </div>
 
-      {/* Movable / resizable signal transmission panel */}
-      {currentStep && mode === 'simulation' && (
-        <SignalTransmissionPanel
-          feature={feature}
-          currentStep={currentStep}
-          stepsCount={steps.length}
-          onExplainWhy={
-            currentStep.explainWhyKey
-              ? () => openExplainWhy(currentStep.explainWhyKey!)
-              : undefined
-          }
-        />
-      )}
-
       {/* Failure propagation banner */}
       {mode === 'failure' && failureActive && (
         <motion.div

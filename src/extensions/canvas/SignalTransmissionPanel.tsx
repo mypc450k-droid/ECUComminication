@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { createPortal } from 'react-dom';
+import { motion } from 'framer-motion';
 import { useExtensionStore } from '../store/extensionStore';
 import { getStagesForStep, getActiveStageIndex } from '../lib/signalTransmissionStages';
 import { cn } from '@/lib/utils';
@@ -22,6 +23,13 @@ interface SignalTransmissionPanelProps {
   onExplainWhy?: () => void;
 }
 
+function getDefaultPosition(width: number, height: number) {
+  return {
+    x: Math.max(16, window.innerWidth - width - 280),
+    y: Math.max(72, window.innerHeight - height - 200),
+  };
+}
+
 export function SignalTransmissionPanel({
   feature,
   currentStep,
@@ -30,34 +38,46 @@ export function SignalTransmissionPanel({
 }: SignalTransmissionPanelProps) {
   const layout = useExtensionStore((s) => s.signalPanelLayout);
   const setSignalPanelLayout = useExtensionStore((s) => s.setSignalPanelLayout);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const dragRef = useRef<{ startX: number; startY: number; origX: number; origBottom: number } | null>(null);
+  const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number } | null>(null);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   const signalStages = getStagesForStep(currentStep, feature);
   const activeStageIdx = getActiveStageIndex(currentStep);
 
+  useEffect(() => setMounted(true), []);
+
+  // Migrate legacy bottom-offset coords (small y) to viewport top position
+  useEffect(() => {
+    if (layout.y > 0 && layout.y < 120 && layout.x < 200) {
+      const pos = getDefaultPosition(layout.width, layout.height);
+      setSignalPanelLayout({ x: pos.x, y: pos.y });
+    } else if (layout.x === 0 && layout.y === 0) {
+      const pos = getDefaultPosition(layout.width, layout.height);
+      setSignalPanelLayout({ x: pos.x, y: pos.y });
+    }
+  }, [layout.x, layout.y, layout.width, layout.height, setSignalPanelLayout]);
+
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
-      const container = containerRef.current?.parentElement;
-      const maxW = container ? container.clientWidth - 8 : 800;
-      const maxH = container ? container.clientHeight - 8 : 500;
+      const maxW = window.innerWidth - 8;
+      const maxH = window.innerHeight - 48;
 
       if (dragRef.current) {
         const dx = e.clientX - dragRef.current.startX;
         const dy = e.clientY - dragRef.current.startY;
         setSignalPanelLayout({
           x: Math.max(0, Math.min(maxW - layout.width, dragRef.current.origX + dx)),
-          y: Math.max(8, Math.min(maxH - 80, dragRef.current.origBottom - dy)),
+          y: Math.max(56, Math.min(maxH - layout.height, dragRef.current.origY + dy)),
         });
       }
       if (resizeRef.current) {
         const dx = e.clientX - resizeRef.current.startX;
         const dy = e.clientY - resizeRef.current.startY;
         setSignalPanelLayout({
-          width: Math.max(320, Math.min(maxW, resizeRef.current.origW + dx)),
-          height: Math.max(140, Math.min(maxH, resizeRef.current.origH + dy)),
+          width: Math.max(300, Math.min(maxW - layout.x, resizeRef.current.origW + dx)),
+          height: Math.max(140, Math.min(maxH - layout.y, resizeRef.current.origH + dy)),
         });
       }
     };
@@ -71,17 +91,17 @@ export function SignalTransmissionPanel({
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
     };
-  }, [layout.width, layout.height, setSignalPanelLayout]);
+  }, [layout.x, layout.y, layout.width, layout.height, setSignalPanelLayout]);
 
   const onDragStart = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('button')) return;
-    e.stopPropagation();
     e.preventDefault();
+    e.stopPropagation();
     dragRef.current = {
       startX: e.clientX,
       startY: e.clientY,
       origX: layout.x,
-      origBottom: layout.y,
+      origY: layout.y,
     };
   };
 
@@ -96,28 +116,30 @@ export function SignalTransmissionPanel({
     };
   };
 
+  if (!mounted) return null;
+
   if (layout.collapsed) {
-    return (
+    return createPortal(
       <button
         type="button"
         onClick={() => setSignalPanelLayout({ collapsed: false })}
-        className="absolute bottom-3 left-3 z-30 glass-panel px-3 py-1.5 text-[10px] text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/10"
+        className="fixed bottom-20 left-4 z-[42] glass-panel px-3 py-1.5 text-[10px] text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/10 shadow-lg"
       >
         ▲ Signal Transmission — Step {currentStep.stepNumber}/{stepsCount}
-      </button>
+      </button>,
+      document.body
     );
   }
 
-  return (
+  const panel = (
     <motion.div
-      ref={containerRef}
       key={currentStep.id}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="absolute z-30 glass-panel-highlight rounded-lg border border-cyan-500/25 shadow-xl flex flex-col pointer-events-auto"
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="fixed z-[42] glass-panel-highlight rounded-lg border border-cyan-500/30 shadow-2xl flex flex-col pointer-events-auto bg-slate-950/95 backdrop-blur-xl"
       style={{
         left: layout.x,
-        bottom: layout.y,
+        top: layout.y,
         width: layout.width,
         height: layout.height,
       }}
@@ -125,7 +147,7 @@ export function SignalTransmissionPanel({
       onWheel={(e) => e.stopPropagation()}
     >
       <div
-        className="flex items-center justify-between px-2 py-1.5 border-b border-cyan-500/15 bg-slate-900/80 cursor-grab active:cursor-grabbing shrink-0 select-none"
+        className="flex items-center justify-between px-2 py-1.5 border-b border-cyan-500/15 bg-slate-900/90 cursor-grab active:cursor-grabbing shrink-0 select-none"
         onMouseDown={onDragStart}
       >
         <div className="flex items-center gap-2 min-w-0">
@@ -146,10 +168,22 @@ export function SignalTransmissionPanel({
             </span>
           )}
         </div>
-        <div className="flex gap-1 shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
+          <span className="text-[7px] text-slate-600 hidden sm:inline">drag header • resize corner</span>
           {onExplainWhy && (
             <button type="button" onClick={onExplainWhy} className="text-[9px] text-indigo-400 px-1">? Why</button>
           )}
+          <button
+            type="button"
+            onClick={() => {
+              const pos = getDefaultPosition(layout.width, layout.height);
+              setSignalPanelLayout({ x: pos.x, y: pos.y });
+            }}
+            className="text-[9px] text-slate-500 hover:text-slate-300 px-1"
+            title="Reset position"
+          >
+            ⟲
+          </button>
           <button
             type="button"
             onClick={() => setSignalPanelLayout({ collapsed: true })}
@@ -211,13 +245,15 @@ export function SignalTransmissionPanel({
 
       <div
         onMouseDown={onResizeStart}
-        className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize"
+        className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize flex items-end justify-end p-0.5"
         title="Resize panel"
       >
-        <svg viewBox="0 0 16 16" className="w-4 h-4 text-slate-600">
+        <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 text-slate-500">
           <path d="M14 14L14 8M14 14L8 14" stroke="currentColor" strokeWidth="1.5" fill="none" />
         </svg>
       </div>
     </motion.div>
   );
+
+  return createPortal(panel, document.body);
 }

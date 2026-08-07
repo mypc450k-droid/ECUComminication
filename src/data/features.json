@@ -463,5 +463,55 @@
       { "id": "sa-bus", "name": "CAN Bus", "type": "bus", "description": "Assist torque frame", "duration": 500 },
       { "id": "sa-rx", "name": "MotorControl SWC", "type": "swc", "description": "EPS motor drive output", "duration": 400 }
     ]
+  },
+  {
+    "id": "media-playback",
+    "name": "Media Playback",
+    "domain": "infotainment",
+    "description": "Driver selects media source; infotainment streams audio via Ethernet to amplifier ECU.",
+    "driverInput": "Touchscreen media play button",
+    "physicalOutput": "Audio output through speakers",
+    "involvedEcus": ["infotainment", "gateway", "cluster"],
+    "involvedNetworks": ["Ethernet", "CAN_HS"],
+    "flowStages": [
+      { "id": "mp-input", "name": "Touch Input", "type": "input", "description": "Driver taps Play on center display", "duration": 600 },
+      { "id": "mp-infotainment", "name": "Infotainment ECU", "type": "ecu", "ecuId": "infotainment", "description": "HMI SWC processes play request", "duration": 800 },
+      { "id": "mp-autosar", "name": "AUTOSAR Stack", "type": "autosar", "description": "SoAd/Ethernet AVB stream setup", "duration": 900 },
+      { "id": "mp-ethernet", "name": "Ethernet Stream", "type": "can", "description": "Audio stream via 100BASE-T1 SOME/IP", "duration": 700 },
+      { "id": "mp-gateway", "name": "Gateway", "type": "gateway", "ecuId": "gateway", "description": "Routes stream to amplifier domain", "duration": 600 },
+      { "id": "mp-can", "name": "CAN Status", "type": "can", "description": "Now-playing metadata to cluster 0x510", "duration": 600 },
+      { "id": "mp-output", "name": "Audio Output", "type": "output", "description": "Speakers play selected track", "duration": 900 }
+    ],
+    "signalFlowStages": [
+      { "id": "mp-swc", "name": "MediaPlayer SWC", "type": "swc", "description": "Decode and stream control", "duration": 400 },
+      { "id": "mp-com", "name": "SoAd/COM", "type": "com", "description": "Ethernet PDU for audio stream", "duration": 400 },
+      { "id": "mp-eth", "name": "Ethernet", "type": "bus", "description": "AVB audio packets", "duration": 500 },
+      { "id": "mp-rx", "name": "Amplifier SWC", "type": "swc", "description": "DAC and speaker drive", "duration": 400 }
+    ]
+  },
+  {
+    "id": "lane-departure",
+    "name": "Lane Departure Warning",
+    "domain": "adas",
+    "description": "Camera detects lane drift; ADAS warns driver via cluster and haptic steering.",
+    "driverInput": "Vehicle drifts toward lane marking without indicator",
+    "physicalOutput": "LDW warning on cluster + steering wheel vibration",
+    "involvedEcus": ["adas", "camera", "cluster", "steering", "gateway"],
+    "involvedNetworks": ["Ethernet", "CAN_HS"],
+    "flowStages": [
+      { "id": "ldw-camera", "name": "Camera ECU", "type": "ecu", "ecuId": "camera", "description": "Lane edge detection algorithm", "duration": 800 },
+      { "id": "ldw-ethernet", "name": "Ethernet", "type": "can", "description": "Lane geometry SOME/IP to ADAS", "duration": 600 },
+      { "id": "ldw-adas", "name": "ADAS ECU", "type": "ecu", "ecuId": "adas", "description": "LDW algorithm evaluates drift", "duration": 900 },
+      { "id": "ldw-can", "name": "CAN HS", "type": "can", "description": "Warning request CAN 0x320", "duration": 600 },
+      { "id": "ldw-cluster", "name": "Cluster", "type": "ecu", "ecuId": "cluster", "description": "LDW icon and chime triggered", "duration": 700 },
+      { "id": "ldw-steering", "name": "Steering ECU", "type": "ecu", "ecuId": "steering", "description": "Haptic pulse on steering wheel", "duration": 700 },
+      { "id": "ldw-output", "name": "Warning Active", "type": "output", "description": "Driver alerted to lane departure", "duration": 800 }
+    ],
+    "signalFlowStages": [
+      { "id": "ldw-swc", "name": "LDW SWC", "type": "swc", "description": "Lane departure detection", "duration": 400 },
+      { "id": "ldw-eth", "name": "Camera Stream", "type": "com", "description": "Ethernet vision data", "duration": 400 },
+      { "id": "ldw-com", "name": "COM", "type": "com", "description": "Warning status PDU", "duration": 400 },
+      { "id": "ldw-bus", "name": "CAN Bus", "type": "bus", "description": "Warning broadcast", "duration": 500 }
+    ]
   }
 ]
