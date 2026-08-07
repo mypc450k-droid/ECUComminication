@@ -101,7 +101,7 @@ export const useExtensionStore = create<ExtensionState & ExtensionActions>()(
       canvasZoomSlider: 100,
       canvasViewMode: 'both',
       ecuCanvasPositions: {},
-      signalPanelLayout: { x: 12, y: 0, width: 520, height: 200, collapsed: false },
+      signalPanelLayout: { x: 0, y: 0, width: 440, height: 260, collapsed: false },
 
       setPanelSize: (key, value) =>
         set((s) => ({ panelLayout: { ...s.panelLayout, [key]: value } })),

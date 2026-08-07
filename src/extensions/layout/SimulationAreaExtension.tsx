@@ -8,7 +8,9 @@ import { StepInspectorPro } from '../panels/StepInspectorPro';
 import { SmartKnowledgePanel } from '../panels/SmartKnowledgePanel';
 import { CanvasEnhancementLayer } from '../canvas/CanvasEnhancementLayer';
 import { SimulationHistoryPanel } from '../history/SimulationHistoryPanel';
+import { SignalTransmissionPanel } from '../canvas/SignalTransmissionPanel';
 import { useSimulationHistoryRecorder } from '../hooks/useSimulationHistory';
+import { useAppStore } from '@/lib/store';
 import type { SimulationFeature, SimulationStep } from '@/types/simulation';
 
 interface SimulationAreaExtensionProps {
@@ -18,6 +20,7 @@ interface SimulationAreaExtensionProps {
 
 export function SimulationAreaExtension({ feature, currentStep }: SimulationAreaExtensionProps) {
   useSimulationHistoryRecorder();
+  const openExplainWhy = useAppStore((s) => s.openExplainWhy);
   const panelLayout = useExtensionStore((s) => s.panelLayout);
   const setPanelSize = useExtensionStore((s) => s.setPanelSize);
   const stepInspector = useExtensionStore((s) => s.stepInspector);
@@ -72,6 +75,20 @@ export function SimulationAreaExtension({ feature, currentStep }: SimulationArea
       {/* Detached inspector portal — mounted outside panel layout */}
       {stepInspector.detached && (
         <StepInspectorPro step={currentStep} feature={feature} />
+      )}
+
+      {/* Signal transmission — viewport portal (does not clip on canvas) */}
+      {currentStep && (
+        <SignalTransmissionPanel
+          feature={feature}
+          currentStep={currentStep}
+          stepsCount={feature.steps.length}
+          onExplainWhy={
+            currentStep.explainWhyKey
+              ? () => openExplainWhy(currentStep.explainWhyKey!)
+              : undefined
+          }
+        />
       )}
 
       <SimulationHistoryPanel />

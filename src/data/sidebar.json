@@ -49,7 +49,8 @@
         "type": "domain",
         "domain": "adas",
         "children": [
-          { "id": "feature-adaptive-cruise", "label": "Adaptive Cruise", "type": "feature", "featureId": "adaptive-cruise" }
+          { "id": "feature-adaptive-cruise", "label": "Adaptive Cruise", "type": "feature", "featureId": "adaptive-cruise" },
+          { "id": "feature-lane-departure", "label": "Lane Departure", "type": "feature", "featureId": "lane-departure" }
         ]
       },
       {
@@ -66,7 +67,9 @@
         "label": "Infotainment",
         "type": "domain",
         "domain": "infotainment",
-        "children": []
+        "children": [
+          { "id": "feature-media-playback", "label": "Media Playback", "type": "feature", "featureId": "media-playback" }
+        ]
       },
       {
         "id": "safety",
