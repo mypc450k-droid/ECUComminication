@@ -53,7 +53,7 @@ export function SimulationEngine() {
 
       {featureTab === 'failure' && (
         <div className="flex-1 min-h-0">
-          <FailureSimulatorPro />
+          <FailureSimulatorPro feature={feature} />
         </div>
       )}
       {featureTab === 'network' && (
