@@ -10,6 +10,7 @@ import type {
   StepInspectorState,
   CanvasViewMode,
   EcuCanvasPosition,
+  SignalPanelLayout,
 } from '../types';
 
 interface ExtensionState {
@@ -30,6 +31,7 @@ interface ExtensionState {
   canvasZoomSlider: number;
   canvasViewMode: CanvasViewMode;
   ecuCanvasPositions: Record<string, Record<string, EcuCanvasPosition>>;
+  signalPanelLayout: SignalPanelLayout;
 }
 
 interface ExtensionActions {
@@ -54,6 +56,7 @@ interface ExtensionActions {
   setCanvasViewMode: (mode: CanvasViewMode) => void;
   setEcuPosition: (featureId: string, ecuId: string, pos: EcuCanvasPosition) => void;
   resetEcuPositions: (featureId: string) => void;
+  setSignalPanelLayout: (layout: Partial<SignalPanelLayout>) => void;
   exportHistoryJson: () => string;
   exportHistoryCsv: () => string;
 }
@@ -83,7 +86,14 @@ export const useExtensionStore = create<ExtensionState & ExtensionActions>()(
       selectedPacket: null,
       packetInspectorOpen: false,
       extendedPlaybackSpeed: 1,
-      stepInspector: { maximized: false, minimized: false, pinned: false, detached: false, detachedPosition: { x: 0, y: 0 } },
+      stepInspector: {
+        maximized: false,
+        minimized: false,
+        pinned: false,
+        detached: false,
+        detachedPosition: { x: 0, y: 0 },
+        detachedSize: { width: 480, height: 520 },
+      },
       failureSimStep: 0,
       failureSimRunning: false,
       failureSimAuto: false,
@@ -91,6 +101,7 @@ export const useExtensionStore = create<ExtensionState & ExtensionActions>()(
       canvasZoomSlider: 100,
       canvasViewMode: 'both',
       ecuCanvasPositions: {},
+      signalPanelLayout: { x: 12, y: 0, width: 520, height: 200, collapsed: false },
 
       setPanelSize: (key, value) =>
         set((s) => ({ panelLayout: { ...s.panelLayout, [key]: value } })),
@@ -174,6 +185,9 @@ export const useExtensionStore = create<ExtensionState & ExtensionActions>()(
           ecuCanvasPositions: { ...s.ecuCanvasPositions, [featureId]: {} },
         })),
 
+      setSignalPanelLayout: (layout) =>
+        set((s) => ({ signalPanelLayout: { ...s.signalPanelLayout, ...layout } })),
+
       exportHistoryJson: () => JSON.stringify(get().simulationHistory, null, 2),
 
       exportHistoryCsv: () => {
@@ -191,6 +205,8 @@ export const useExtensionStore = create<ExtensionState & ExtensionActions>()(
         panelLayout: state.panelLayout,
         ecuCanvasPositions: state.ecuCanvasPositions,
         canvasViewMode: state.canvasViewMode,
+        signalPanelLayout: state.signalPanelLayout,
+        stepInspector: state.stepInspector,
       }),
     }
   )

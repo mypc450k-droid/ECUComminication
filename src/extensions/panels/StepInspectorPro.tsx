@@ -121,7 +121,7 @@ export function StepInspectorPro({ step, feature }: StepInspectorProProps) {
           <ToolBtn onClick={() => setStepInspector({ maximized: !stepInspector.maximized })} title="Maximize">⬜</ToolBtn>
           <ToolBtn onClick={() => setStepInspector({ minimized: true })} title="Minimize">—</ToolBtn>
           <ToolBtn onClick={() => setStepInspector({ pinned: !stepInspector.pinned })} title="Pin">📌</ToolBtn>
-          <ToolBtn onClick={() => setStepInspector({ detached: true })} title="Detach">↗</ToolBtn>
+          <ToolBtn onClick={() => setStepInspector({ detached: true, maximized: false })} title="Detach">↗</ToolBtn>
         </div>
       </div>
 

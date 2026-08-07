@@ -70,6 +70,15 @@ export interface StepInspectorState {
   pinned: boolean;
   detached: boolean;
   detachedPosition: { x: number; y: number };
+  detachedSize: { width: number; height: number };
+}
+
+export interface SignalPanelLayout {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  collapsed: boolean;
 }
 
 export type CanvasViewMode = 'ecu' | 'signal' | 'both';
