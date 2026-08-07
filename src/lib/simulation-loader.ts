@@ -95,13 +95,18 @@ function convertFlowStageToStep(stage: FlowStage, index: number, feature: Featur
     executionTimeMs: stage.duration,
     explainWhyKey: explainKey,
     showMeMoreKey: stage.ecuId || explainKey,
-    canvasPosition: { x: 100 + (index % 4) * 180, y: 80 + Math.floor(index / 4) * 120 },
+    canvasPosition: { x: 60 + (index % 6) * 130, y: 50 + Math.floor(index / 6) * 100 },
   };
 }
 
 export function getSimulationFeature(featureId: string): SimulationFeature | undefined {
   if (enhancedSimulations[featureId]) {
-    return enhancedSimulations[featureId];
+    const enhanced = enhancedSimulations[featureId];
+    const legacy = features.find((f) => f.id === featureId);
+    return {
+      ...enhanced,
+      signalFlowStages: enhanced.signalFlowStages ?? legacy?.signalFlowStages,
+    };
   }
 
   const legacy = features.find((f) => f.id === featureId);

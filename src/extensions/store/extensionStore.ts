@@ -8,6 +8,8 @@ import type {
   CommViewMode,
   ExtendedPlaybackSpeed,
   StepInspectorState,
+  CanvasViewMode,
+  EcuCanvasPosition,
 } from '../types';
 
 interface ExtensionState {
@@ -26,6 +28,8 @@ interface ExtensionState {
   failureSimAuto: boolean;
   signalEvolutionOpen: boolean;
   canvasZoomSlider: number;
+  canvasViewMode: CanvasViewMode;
+  ecuCanvasPositions: Record<string, Record<string, EcuCanvasPosition>>;
 }
 
 interface ExtensionActions {
@@ -47,6 +51,9 @@ interface ExtensionActions {
   setFailureSimAuto: (auto: boolean) => void;
   toggleSignalEvolution: () => void;
   setCanvasZoomSlider: (zoom: number) => void;
+  setCanvasViewMode: (mode: CanvasViewMode) => void;
+  setEcuPosition: (featureId: string, ecuId: string, pos: EcuCanvasPosition) => void;
+  resetEcuPositions: (featureId: string) => void;
   exportHistoryJson: () => string;
   exportHistoryCsv: () => string;
 }
@@ -76,12 +83,14 @@ export const useExtensionStore = create<ExtensionState & ExtensionActions>()(
       selectedPacket: null,
       packetInspectorOpen: false,
       extendedPlaybackSpeed: 1,
-      stepInspector: { maximized: false, minimized: false, pinned: false, detached: false },
+      stepInspector: { maximized: false, minimized: false, pinned: false, detached: false, detachedPosition: { x: 0, y: 0 } },
       failureSimStep: 0,
       failureSimRunning: false,
       failureSimAuto: false,
       signalEvolutionOpen: true,
       canvasZoomSlider: 100,
+      canvasViewMode: 'both',
+      ecuCanvasPositions: {},
 
       setPanelSize: (key, value) =>
         set((s) => ({ panelLayout: { ...s.panelLayout, [key]: value } })),
@@ -150,6 +159,21 @@ export const useExtensionStore = create<ExtensionState & ExtensionActions>()(
 
       setCanvasZoomSlider: (zoom) => set({ canvasZoomSlider: zoom }),
 
+      setCanvasViewMode: (mode) => set({ canvasViewMode: mode }),
+
+      setEcuPosition: (featureId, ecuId, pos) =>
+        set((s) => ({
+          ecuCanvasPositions: {
+            ...s.ecuCanvasPositions,
+            [featureId]: { ...s.ecuCanvasPositions[featureId], [ecuId]: pos },
+          },
+        })),
+
+      resetEcuPositions: (featureId) =>
+        set((s) => ({
+          ecuCanvasPositions: { ...s.ecuCanvasPositions, [featureId]: {} },
+        })),
+
       exportHistoryJson: () => JSON.stringify(get().simulationHistory, null, 2),
 
       exportHistoryCsv: () => {
@@ -163,7 +187,11 @@ export const useExtensionStore = create<ExtensionState & ExtensionActions>()(
     }),
     {
       name: 'vehicleverse-panel-layout',
-      partialize: (state) => ({ panelLayout: state.panelLayout }),
+      partialize: (state) => ({
+        panelLayout: state.panelLayout,
+        ecuCanvasPositions: state.ecuCanvasPositions,
+        canvasViewMode: state.canvasViewMode,
+      }),
     }
   )
 );

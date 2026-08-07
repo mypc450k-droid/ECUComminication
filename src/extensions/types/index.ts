@@ -69,4 +69,12 @@ export interface StepInspectorState {
   minimized: boolean;
   pinned: boolean;
   detached: boolean;
+  detachedPosition: { x: number; y: number };
+}
+
+export type CanvasViewMode = 'ecu' | 'signal' | 'both';
+
+export interface EcuCanvasPosition {
+  x: number;
+  y: number;
 }

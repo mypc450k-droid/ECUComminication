@@ -5,7 +5,7 @@ import { HeaderBar } from '@/components/HeaderBar';
 import { Sidebar } from '@/components/Sidebar';
 import { InspectorPanel } from '@/components/InspectorPanel';
 import { ArchitectureView } from '@/components/ArchitectureView';
-import { AutosarExplorer } from '@/components/AutosarExplorer';
+import { AutosarExplorerEnhancement } from '@/extensions/autosar/AutosarExplorerEnhancement';
 import { FeatureSimulation } from '@/components/FeatureSimulation';
 import { useAppStore } from '@/lib/store';
 import { ResizableDashboard } from '@/extensions/layout/ResizableDashboard';
@@ -16,7 +16,7 @@ function CenterView() {
 
   switch (viewMode) {
     case 'autosar':
-      return <AutosarExplorer />;
+      return <AutosarExplorerEnhancement />;
     case 'feature':
       return <FeatureSimulation />;
     default:

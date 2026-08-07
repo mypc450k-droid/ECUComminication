@@ -6,14 +6,16 @@ import { useAppStore } from '@/lib/store';
 import { useExtensionStore } from '../store/extensionStore';
 import { getFailureScenarios, getFailureById } from '@/lib/simulation-loader';
 import { FailureSimulation } from '@/components/simulation/FailureSimulation';
+import { InteractiveEngineeringCanvas } from '../canvas/InteractiveEngineeringCanvas';
 import { GlassPanel } from '@/components/ui/GlassPanel';
 import { cn } from '@/lib/utils';
+import type { SimulationFeature } from '@/types/simulation';
 
 const FAILURE_CHAIN = [
   'Transmit', 'Errors', 'TEC++', 'REC++', 'Bus Off', 'CanSM', 'DEM', 'DTC', 'Cluster Warning', 'Fallback', 'Recovery',
 ];
 
-export function FailureSimulatorPro() {
+export function FailureSimulatorPro({ feature }: { feature: SimulationFeature }) {
   const failures = getFailureScenarios();
   const activeFailureId = useAppStore((s) => s.activeFailureId);
   const setActiveFailureId = useAppStore((s) => s.setActiveFailureId);
@@ -125,7 +127,16 @@ export function FailureSimulatorPro() {
         </GlassPanel>
       )}
 
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="shrink-0 h-[220px] min-h-[180px] border-b border-red-500/10 mx-0 overflow-hidden">
+        <InteractiveEngineeringCanvas
+          feature={feature}
+          mode="failure"
+          failureEcus={active?.involvedEcus ?? []}
+          failureActive={failureSimRunning}
+        />
+      </div>
+
+      <div className="flex-1 min-h-0 overflow-hidden flex">
         <FailureSimulation />
       </div>
     </div>
