@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useCallback, useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
 import { useExtensionStore } from '../store/extensionStore';
 import { getEcuById } from '@/lib/data';
@@ -9,9 +9,8 @@ import { cn } from '@/lib/utils';
 import {
   layoutStepsForCanvas,
   layoutEcuPositions,
-  getStagesForStep,
-  getActiveStageIndex,
 } from '../lib/signalTransmissionStages';
+import { SignalTransmissionPanel } from './SignalTransmissionPanel';
 import type { SimulationFeature, SimulationStep, ECUState } from '@/types/simulation';
 
 const GRID = 40;
@@ -169,9 +168,6 @@ export function InteractiveEngineeringCanvas({
       y: e.clientY - (y * scale + canvasPan.y),
     });
   };
-
-  const signalStages = currentStep ? getStagesForStep(currentStep, feature) : [];
-  const activeStageIdx = currentStep ? getActiveStageIndex(currentStep) : 0;
 
   return (
     <div className="relative flex-1 overflow-hidden engineering-bg h-full" ref={containerRef}>
@@ -384,77 +380,19 @@ export function InteractiveEngineeringCanvas({
         </div>
       </div>
 
-      {/* Live signal transmission ribbon */}
-      <AnimatePresence>
-        {currentStep && mode === 'simulation' && (
-          <motion.div
-            key={currentStep.id}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 12 }}
-            className="absolute bottom-3 left-3 right-3 z-30 glass-panel-highlight rounded-lg border border-cyan-500/20 p-2 max-h-[140px]"
-          >
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono text-cyan-400">
-                  Step {currentStep.stepNumber}/{steps.length}
-                </span>
-                <span className="text-xs font-semibold text-slate-100">{currentStep.title}</span>
-                {currentStep.network && (
-                  <span
-                    className="text-[8px] px-1.5 py-0.5 rounded font-mono"
-                    style={{
-                      color: networkColors[currentStep.network],
-                      backgroundColor: `${networkColors[currentStep.network]}15`,
-                      border: `1px solid ${networkColors[currentStep.network]}40`,
-                    }}
-                  >
-                    {currentStep.network}
-                  </span>
-                )}
-              </div>
-              {currentStep.explainWhyKey && (
-                <button
-                  type="button"
-                  onClick={() => openExplainWhy(currentStep.explainWhyKey!)}
-                  className="text-[9px] text-indigo-400 hover:text-indigo-300"
-                >
-                  ? Why
-                </button>
-              )}
-            </div>
-
-            <div className="flex gap-1 overflow-x-auto custom-scrollbar pb-1">
-              {signalStages.map((stage, si) => {
-                const isStageActive = si === activeStageIdx;
-                return (
-                  <motion.div
-                    key={stage.id}
-                    className={cn(
-                      'shrink-0 rounded border px-2 py-1 min-w-[120px] max-w-[160px]',
-                      isStageActive
-                        ? 'border-cyan-500/50 bg-cyan-500/10'
-                        : 'border-slate-700/40 bg-slate-900/50'
-                    )}
-                    animate={isStageActive ? { scale: [1, 1.02, 1] } : {}}
-                    transition={{ duration: 1, repeat: isStageActive ? Infinity : 0 }}
-                  >
-                    <p className="text-[8px] text-slate-500 uppercase">{stage.layer}</p>
-                    <p className="text-[9px] font-semibold text-slate-200 truncate">{stage.label}</p>
-                    <p className="text-[8px] font-mono text-cyan-400/90 truncate">{stage.representation}</p>
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {currentStep.canId && (
-              <p className="text-[8px] font-mono text-slate-500 mt-1 truncate">
-                Frame: {currentStep.canId} • {currentStep.payload || '—'} • {currentStep.sender || '—'} → {currentStep.receiver || '—'}
-              </p>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Movable / resizable signal transmission panel */}
+      {currentStep && mode === 'simulation' && (
+        <SignalTransmissionPanel
+          feature={feature}
+          currentStep={currentStep}
+          stepsCount={steps.length}
+          onExplainWhy={
+            currentStep.explainWhyKey
+              ? () => openExplainWhy(currentStep.explainWhyKey!)
+              : undefined
+          }
+        />
+      )}
 
       {/* Failure propagation banner */}
       {mode === 'failure' && failureActive && (

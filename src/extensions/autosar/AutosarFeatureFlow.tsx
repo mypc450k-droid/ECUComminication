@@ -98,6 +98,7 @@ export function AutosarFeatureFlow({ feature }: { feature: SimulationFeature }) 
                   >
                     <p className="text-[8px] text-slate-500">{s.layer}</p>
                     <p className="text-[9px] font-mono text-cyan-300 truncate">{s.representation}</p>
+                    <p className="text-[8px] text-slate-500 mt-0.5 line-clamp-2">{s.simpleExplanation}</p>
                   </div>
                 ))}
               </div>

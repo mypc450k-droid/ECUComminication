@@ -23,7 +23,7 @@ export function SimulationAreaExtension({ feature, currentStep }: SimulationArea
   const stepInspector = useExtensionStore((s) => s.stepInspector);
   const setStepInspector = useExtensionStore((s) => s.setStepInspector);
 
-  const stepPanelMax = stepInspector.maximized ? 60 : panelLayout.stepPanelWidth;
+  const stepPanelMax = stepInspector.maximized && !stepInspector.detached ? 45 : panelLayout.stepPanelWidth;
 
   return (
     <div className="flex flex-1 min-h-0 flex-col">
