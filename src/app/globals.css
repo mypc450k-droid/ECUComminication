@@ -208,9 +208,67 @@ body {
   border: 1px solid rgba(59, 130, 246, 0.4);
 }
 
-.asil-a,
-.asil-qm {
-  background: rgba(148, 163, 184, 0.2);
-  color: #94a3b8;
-  border: 1px solid rgba(148, 163, 184, 0.3);
+/* Homepage architecture — CSS-only edge animation (no React state loops) */
+.vv-architecture-edge-pulse-ambient {
+  animation: vv-edge-flow-ambient 4.5s linear infinite;
+}
+
+.vv-architecture-edge-pulse-strong {
+  animation: vv-edge-flow-strong 1.8s linear infinite;
+}
+
+.vv-architecture-edge-dot-trail {
+  animation: vv-edge-flow-strong 1.2s linear infinite;
+}
+
+@keyframes vv-edge-flow-ambient {
+  to {
+    stroke-dashoffset: -23;
+  }
+}
+
+@keyframes vv-edge-flow-strong {
+  to {
+    stroke-dashoffset: -42;
+  }
+}
+
+.vv-architecture-ecu-active {
+  animation: vv-ecu-active-glow 2s ease-in-out infinite;
+}
+
+@keyframes vv-ecu-active-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(0, 212, 255, 0.45);
+  }
+}
+
+.vv-architecture-autosar-dot {
+  animation: vv-autosar-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes vv-autosar-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.vv-architecture-workspace .react-flow__viewport {
+  transition: transform 0.15s ease-out;
+}
+
+.vv-architecture-workspace .react-flow__pane {
+  cursor: grab;
+}
+
+.vv-architecture-workspace .react-flow__pane:active {
+  cursor: grabbing;
 }

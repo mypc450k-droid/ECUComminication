@@ -48,7 +48,7 @@ export function buildPartnerEdges(ecus: ECU[]): Edge[] {
         id: key,
         source,
         target,
-        type: 'smoothstep',
+        type: 'architecture',
         animated: false,
         style: {
           stroke: color,
@@ -84,7 +84,7 @@ export function buildPartnerEdges(ecus: ECU[]): Edge[] {
           id: key,
           source: 'gateway',
           target: memberId,
-          type: 'smoothstep',
+          type: 'architecture',
           animated: false,
           style: { stroke: color, strokeWidth: 1, opacity: 0.2 },
           data: { networkType },
