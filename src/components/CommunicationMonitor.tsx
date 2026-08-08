@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore, startCommunicationTicker, stopCommunicationTicker } from '@/lib/store';
+import { getSimulationFeature } from '@/lib/simulation-loader';
 import { NetworkBadge } from './ui/Badges';
 import { PacketLane } from './simulation/PacketLane';
 import { cn } from '@/lib/utils';
@@ -11,6 +12,15 @@ export function CommunicationMonitor({ embedded = false }: { embedded?: boolean 
   const messages = useAppStore((s) => s.communicationMessages);
   const bottomPanelExpanded = useAppStore((s) => s.bottomPanelExpanded);
   const toggleBottomPanel = useAppStore((s) => s.toggleBottomPanel);
+  const selectedFeatureId = useAppStore((s) => s.selectedFeatureId);
+  const currentStepIndex = useAppStore((s) => s.currentStepIndex);
+
+  const activeCanId = useMemo(() => {
+    if (!selectedFeatureId || currentStepIndex < 0) return null;
+    const feature = getSimulationFeature(selectedFeatureId);
+    const step = feature?.steps[currentStepIndex];
+    return step?.canId ?? null;
+  }, [selectedFeatureId, currentStepIndex]);
 
   useEffect(() => {
     startCommunicationTicker();
@@ -69,15 +79,24 @@ export function CommunicationMonitor({ embedded = false }: { embedded?: boolean 
                 </thead>
                 <tbody>
                   <AnimatePresence mode="popLayout">
-                    {messages.map((msg, i) => (
+                    {messages.map((msg, i) => {
+                      const isStepMatch = activeCanId && msg.canId.toLowerCase() === activeCanId.toLowerCase();
+                      return (
                       <motion.tr
                         key={msg.id}
                         data-packet-id={msg.id}
                         initial={{ opacity: 0, x: -20, backgroundColor: 'rgba(0,212,255,0.1)' }}
-                        animate={{ opacity: 1, x: 0, backgroundColor: 'transparent' }}
+                        animate={{
+                          opacity: 1,
+                          x: 0,
+                          backgroundColor: isStepMatch ? 'rgba(0,212,255,0.12)' : 'transparent',
+                        }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="border-b border-slate-800/50 hover:bg-cyan-500/5"
+                        className={cn(
+                          'border-b border-slate-800/50 hover:bg-cyan-500/5',
+                          isStepMatch && 'ring-1 ring-inset ring-cyan-500/30'
+                        )}
                       >
                         <td className="px-4 py-1.5 text-[10px] font-mono text-slate-500">
                           {msg.timestamp}
@@ -117,7 +136,8 @@ export function CommunicationMonitor({ embedded = false }: { embedded?: boolean 
                           </span>
                         </td>
                       </motion.tr>
-                    ))}
+                      );
+                    })}
                   </AnimatePresence>
                 </tbody>
               </table>
