@@ -19,9 +19,10 @@ import { NetworkLegend } from '@/components/NetworkLegend';
 import { useExtensionStore } from '../store/extensionStore';
 import { VehicleSilhouette } from './VehicleSilhouette';
 import { getVehicleLayoutPosition } from './vehicleZoneLayout';
-import { buildPartnerEdges, getConnectedEcuIds, networkColors } from './buildPartnerEdges';
+import { buildPartnerEdges, getConnectedEcuIds } from './buildPartnerEdges';
 
 const nodeTypes = { ecuNode: ECUNode };
+const EMPTY_CONNECTED_IDS: string[] = [];
 
 export function ArchitectureViewEnhancement() {
   const selectedEcuId = useAppStore((s) => s.selectedEcuId);
@@ -44,27 +45,25 @@ export function ArchitectureViewEnhancement() {
     : null;
 
   const focusEcuId = ecuFocusId ?? selectedEcuId;
-  const connectedIds = focusEcuId ? getConnectedEcuIds(focusEcuId, ecus) : [];
+  const connectedIds = useMemo(
+    () => (focusEcuId ? getConnectedEcuIds(focusEcuId, ecus) : EMPTY_CONNECTED_IDS),
+    [focusEcuId]
+  );
 
-  const relevantIds = useMemo(() => {
-    const ids = new Set<string>();
-    if (traceSignalMode && tracedSignalPath.length > 0) {
-      tracedSignalPath.forEach((id) => ids.add(id));
-      return ids;
-    }
-    if (focusEcuId) {
-      connectedIds.forEach((id) => ids.add(id));
-      return ids;
-    }
-    highlightedIds.forEach((id) => ids.add(id));
-    return ids;
+  const relevantIdList = useMemo(() => {
+    if (traceSignalMode && tracedSignalPath.length > 0) return tracedSignalPath;
+    if (focusEcuId) return connectedIds;
+    return highlightedIds;
   }, [traceSignalMode, tracedSignalPath, focusEcuId, connectedIds, highlightedIds]);
+
+  const relevantIdKey = relevantIdList.join('|');
 
   const hasFocus = Boolean(focusEcuId || traceSignalMode || highlightedIds.length > 0);
 
-  const buildNodes = useCallback((): Node[] =>
-    ecus.map((ecu) => {
-      const isRelevant = !hasFocus || relevantIds.has(ecu.id);
+  const buildNodes = useCallback((): Node[] => {
+    const relevantSet = new Set(relevantIdList);
+    return ecus.map((ecu) => {
+      const isRelevant = !hasFocus || relevantSet.has(ecu.id);
       const isSelected = ecu.id === selectedEcuId || ecu.id === ecuFocusId;
       return {
         id: ecu.id,
@@ -78,8 +77,16 @@ export function ArchitectureViewEnhancement() {
           dimmed: hasFocus && !isRelevant,
         } satisfies ECUNodeData & { dimmed?: boolean },
       };
-    }),
-  [selectedEcuId, ecuFocusId, highlightedIds, connectedIds, activeEcuId, hasFocus, relevantIds]);
+    });
+  }, [
+    relevantIdKey,
+    hasFocus,
+    selectedEcuId,
+    ecuFocusId,
+    highlightedIds,
+    connectedIds,
+    activeEcuId,
+  ]);
 
   const initialNodes = useMemo(() => buildNodes(), [buildNodes]);
   const initialEdges = useMemo(() => buildPartnerEdges(ecus), []);
@@ -95,13 +102,13 @@ export function ArchitectureViewEnhancement() {
     if (isSimulationRunning && feature) {
       const stage = feature.flowStages[activeFlowStage];
       const activeNetwork = stage?.type === 'can' || stage?.type === 'lin' || stage?.type === 'bus';
+      const relevantSet = new Set(relevantIdList);
 
       setEdges((eds) =>
         eds.map((e) => {
           const isActive =
             activeNetwork &&
             (e.source === activeEcuId || e.target === activeEcuId);
-          const networkType = (e.data as { networkType?: string })?.networkType;
           return {
             ...e,
             animated: isActive,
@@ -109,26 +116,27 @@ export function ArchitectureViewEnhancement() {
               ...e.style,
               strokeWidth: isActive ? 2.5 : (e.style?.strokeWidth as number) ?? 1.2,
               opacity: isActive ? 0.9 : hasFocus
-                ? (relevantIds.has(e.source as string) && relevantIds.has(e.target as string) ? 0.5 : 0.08)
+                ? (relevantSet.has(e.source as string) && relevantSet.has(e.target as string) ? 0.5 : 0.08)
                 : 0.35,
             },
           };
         })
       );
     } else {
+      const relevantSet = new Set(relevantIdList);
       setEdges(
         buildPartnerEdges(ecus).map((e) => ({
           ...e,
           style: {
             ...e.style,
             opacity: hasFocus
-              ? relevantIds.has(e.source) && relevantIds.has(e.target) ? 0.55 : 0.06
+              ? relevantSet.has(e.source) && relevantSet.has(e.target) ? 0.55 : 0.06
               : 0.35,
           },
         }))
       );
     }
-  }, [activeFlowStage, isSimulationRunning, activeEcuId, feature, setEdges, hasFocus, relevantIds]);
+  }, [activeFlowStage, isSimulationRunning, activeEcuId, feature, setEdges, hasFocus, relevantIdKey]);
 
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
