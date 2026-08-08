@@ -87,3 +87,12 @@ export interface EcuCanvasPosition {
   x: number;
   y: number;
 }
+
+export interface ExtensionUIState {
+  presentationMode: boolean;
+  focusMode: boolean;
+  traceSignalMode: boolean;
+  tracedSignalId: string | null;
+  tracedSignalPath: string[];
+  ecuFocusId: string | null;
+}

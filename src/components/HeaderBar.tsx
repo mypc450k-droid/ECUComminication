@@ -1,11 +1,16 @@
 'use client';
 
 import { useAppStore } from '@/lib/store';
+import { useExtensionStore } from '@/extensions/store/extensionStore';
 import { StatusDot } from './ui/Badges';
+import { cn } from '@/lib/utils';
 
 export function HeaderBar() {
   const viewMode = useAppStore((s) => s.viewMode);
   const selectedFeatureId = useAppStore((s) => s.selectedFeatureId);
+  const presentationMode = useExtensionStore((s) => s.presentationMode);
+  const setPresentationMode = useExtensionStore((s) => s.setPresentationMode);
+  const focusMode = useExtensionStore((s) => s.focusMode);
 
   const modeLabels: Record<string, string> = {
     architecture: 'Vehicle Architecture',
@@ -48,6 +53,22 @@ export function HeaderBar() {
       </div>
 
       <div className="flex items-center gap-4">
+        <button
+          type="button"
+          onClick={() => setPresentationMode(!presentationMode)}
+          className={cn(
+            'text-[9px] px-2 py-1 rounded border font-mono transition-colors',
+            presentationMode
+              ? 'border-cyan-500/40 bg-cyan-500/15 text-cyan-300'
+              : 'border-slate-700/50 text-slate-500 hover:text-slate-300'
+          )}
+          title="Presentation Mode (P)"
+        >
+          {presentationMode ? '● Presenting' : 'Present'}
+        </button>
+        {focusMode && (
+          <span className="text-[9px] text-amber-400/80 font-mono">Focus Mode</span>
+        )}
         <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
           <span className="flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />

@@ -6,6 +6,7 @@ import type { FeatureTab } from '@/types/simulation';
 
 const tabs: { id: FeatureTab; label: string }[] = [
   { id: 'simulation', label: 'Simulation' },
+  { id: 'integrated', label: 'System + AUTOSAR' },
   { id: 'failure', label: 'Failure Injection' },
   { id: 'network', label: 'Network' },
   { id: 'autosar-stack', label: 'AUTOSAR' },

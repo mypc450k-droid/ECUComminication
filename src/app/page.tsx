@@ -4,7 +4,8 @@ import { useEffect } from 'react';
 import { HeaderBar } from '@/components/HeaderBar';
 import { Sidebar } from '@/components/Sidebar';
 import { InspectorPanel } from '@/components/InspectorPanel';
-import { ArchitectureView } from '@/components/ArchitectureView';
+import { ArchitectureViewEnhancement } from '@/extensions/architecture/ArchitectureViewEnhancement';
+import { PresentationModeController } from '@/extensions/presentation/PresentationModeController';
 import { AutosarExplorerEnhancement } from '@/extensions/autosar/AutosarExplorerEnhancement';
 import { FeatureSimulation } from '@/components/FeatureSimulation';
 import { useAppStore } from '@/lib/store';
@@ -20,7 +21,7 @@ function CenterView() {
     case 'feature':
       return <FeatureSimulation />;
     default:
-      return <ArchitectureView />;
+      return <ArchitectureViewEnhancement />;
   }
 }
 
@@ -34,6 +35,7 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-[#0a0e17]">
       <HeaderBar />
+      <PresentationModeController />
       <ResizableDashboard
         sidebar={<div className="w-full h-full [&_aside]:!w-full"><Sidebar /></div>}
         main={<CenterView />}

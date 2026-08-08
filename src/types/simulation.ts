@@ -1,7 +1,7 @@
 import type { NetworkType, FlowStage, VehicleDomain } from './index';
 
 export type LearningMode = 'beginner' | 'intermediate' | 'expert';
-export type FeatureTab = 'simulation' | 'failure' | 'network' | 'autosar-stack' | 'topology3d';
+export type FeatureTab = 'simulation' | 'integrated' | 'failure' | 'network' | 'autosar-stack' | 'topology3d';
 export type PlaybackSpeed = 0.5 | 1 | 2;
 export type ECUState =
   | 'sleeping'

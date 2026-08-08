@@ -17,13 +17,13 @@ export interface ECUNodeData {
 
 function ECUNodeComponent({ data }: NodeProps) {
   const nodeData = data as ECUNodeData;
-  const { ecu, selected, highlighted, activeInFlow } = nodeData;
+  const { ecu, selected, highlighted, activeInFlow, dimmed } = nodeData as ECUNodeData & { dimmed?: boolean };
 
   return (
   <motion.div
     initial={{ opacity: 0, scale: 0.8 }}
     animate={{
-      opacity: 1,
+      opacity: dimmed ? 0.25 : 1,
       scale: activeInFlow ? 1.08 : selected ? 1.05 : 1,
     }}
     transition={{ duration: 0.3, type: 'spring', stiffness: 300 }}

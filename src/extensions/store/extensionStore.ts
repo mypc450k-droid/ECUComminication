@@ -32,6 +32,12 @@ interface ExtensionState {
   canvasViewMode: CanvasViewMode;
   ecuCanvasPositions: Record<string, Record<string, EcuCanvasPosition>>;
   signalPanelLayout: SignalPanelLayout;
+  presentationMode: boolean;
+  focusMode: boolean;
+  traceSignalMode: boolean;
+  tracedSignalId: string | null;
+  tracedSignalPath: string[];
+  ecuFocusId: string | null;
 }
 
 interface ExtensionActions {
@@ -57,6 +63,11 @@ interface ExtensionActions {
   setEcuPosition: (featureId: string, ecuId: string, pos: EcuCanvasPosition) => void;
   resetEcuPositions: (featureId: string) => void;
   setSignalPanelLayout: (layout: Partial<SignalPanelLayout>) => void;
+  setPresentationMode: (enabled: boolean) => void;
+  setFocusMode: (enabled: boolean) => void;
+  startTraceSignal: (signalId: string, path: string[]) => void;
+  clearTraceSignal: () => void;
+  setEcuFocusId: (id: string | null) => void;
   exportHistoryJson: () => string;
   exportHistoryCsv: () => string;
 }
@@ -102,6 +113,12 @@ export const useExtensionStore = create<ExtensionState & ExtensionActions>()(
       canvasViewMode: 'both',
       ecuCanvasPositions: {},
       signalPanelLayout: { x: 0, y: 0, width: 440, height: 260, collapsed: false },
+      presentationMode: false,
+      focusMode: false,
+      traceSignalMode: false,
+      tracedSignalId: null,
+      tracedSignalPath: [],
+      ecuFocusId: null,
 
       setPanelSize: (key, value) =>
         set((s) => ({ panelLayout: { ...s.panelLayout, [key]: value } })),
@@ -187,6 +204,26 @@ export const useExtensionStore = create<ExtensionState & ExtensionActions>()(
 
       setSignalPanelLayout: (layout) =>
         set((s) => ({ signalPanelLayout: { ...s.signalPanelLayout, ...layout } })),
+
+      setPresentationMode: (enabled) => set({ presentationMode: enabled }),
+
+      setFocusMode: (enabled) => set({ focusMode: enabled }),
+
+      startTraceSignal: (signalId, path) =>
+        set({
+          traceSignalMode: true,
+          tracedSignalId: signalId,
+          tracedSignalPath: path,
+        }),
+
+      clearTraceSignal: () =>
+        set({
+          traceSignalMode: false,
+          tracedSignalId: null,
+          tracedSignalPath: [],
+        }),
+
+      setEcuFocusId: (id) => set({ ecuFocusId: id }),
 
       exportHistoryJson: () => JSON.stringify(get().simulationHistory, null, 2),
 

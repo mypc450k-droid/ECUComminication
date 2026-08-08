@@ -13,6 +13,7 @@ import { NetworkVisualizer } from './NetworkVisualizer';
 import { Topology3DView } from './Topology3DView';
 import { ExplainWhyModal } from './ExplainWhyModal';
 import { ShowMeMoreModal } from './ShowMeMoreModal';
+import { IntegratedSimulationView } from '@/extensions/simulation/IntegratedSimulationView';
 import { GlassPanel } from '@/components/ui/GlassPanel';
 
 export function SimulationEngine() {
@@ -36,6 +37,12 @@ export function SimulationEngine() {
     <div className="flex flex-col h-full min-h-0">
       <FeatureTabs />
       <LearningModeSelector />
+
+      {featureTab === 'integrated' && (
+        <div className="flex flex-col flex-1 min-h-0">
+          <IntegratedSimulationView feature={feature} currentStep={currentStep} />
+        </div>
+      )}
 
       {featureTab === 'simulation' && (
         <div className="flex flex-col flex-1 min-h-0">

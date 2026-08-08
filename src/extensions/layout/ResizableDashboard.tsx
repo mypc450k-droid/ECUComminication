@@ -13,13 +13,16 @@ interface ResizableDashboardProps {
 
 export function ResizableDashboard({ sidebar, main, inspector, commMonitor }: ResizableDashboardProps) {
   const panelLayout = useExtensionStore((s) => s.panelLayout);
+  const presentationMode = useExtensionStore((s) => s.presentationMode);
   const setPanelSize = useExtensionStore((s) => s.setPanelSize);
   const togglePanelCollapse = useExtensionStore((s) => s.togglePanelCollapse);
+
+  const hideChrome = presentationMode;
 
   return (
     <div className="flex flex-1 min-h-0 relative">
       <Group orientation="horizontal" id="vv-main-horizontal" className="flex-1 min-h-0 h-full w-full">
-        {!panelLayout.sidebarCollapsed && (
+        {!panelLayout.sidebarCollapsed && !hideChrome && (
           <>
             <Panel
               id="sidebar"
@@ -38,7 +41,7 @@ export function ResizableDashboard({ sidebar, main, inspector, commMonitor }: Re
           </>
         )}
 
-        {panelLayout.sidebarCollapsed && (
+        {panelLayout.sidebarCollapsed && !hideChrome && (
           <CollapsedBar label="ECU Tree" onExpand={() => togglePanelCollapse('sidebar')} side="left" />
         )}
 
@@ -50,7 +53,7 @@ export function ResizableDashboard({ sidebar, main, inspector, commMonitor }: Re
                   <div className="h-full min-w-0 relative">{main}</div>
                 </Panel>
 
-                {!panelLayout.inspectorCollapsed && (
+                {!panelLayout.inspectorCollapsed && !hideChrome && (
                   <>
                     <ColSeparator />
                     <Panel
@@ -70,7 +73,7 @@ export function ResizableDashboard({ sidebar, main, inspector, commMonitor }: Re
               </Group>
             </Panel>
 
-            {!panelLayout.commMonitorCollapsed && (
+            {!panelLayout.commMonitorCollapsed && !hideChrome && (
               <>
                 <RowSeparator />
                 <Panel
@@ -91,7 +94,7 @@ export function ResizableDashboard({ sidebar, main, inspector, commMonitor }: Re
         </Panel>
       </Group>
 
-      {panelLayout.commMonitorCollapsed && (
+      {panelLayout.commMonitorCollapsed && !hideChrome && (
         <CollapsedBar label="Comm Monitor" onExpand={() => togglePanelCollapse('commMonitor')} side="bottom" />
       )}
     </div>

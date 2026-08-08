@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
 import { getEcuById, getAutosarLayerById, getFeatureById } from '@/lib/data';
+import { EcuInspectorActions } from '@/extensions/panels/EcuInspectorActions';
+import { getVehicleZone, getZoneLabel } from '@/extensions/architecture/vehicleZoneLayout';
 import { GlassPanel } from './ui/GlassPanel';
 import { AsilBadge, NetworkBadge } from './ui/Badges';
 import { cn } from '@/lib/utils';
@@ -57,6 +59,9 @@ export function InspectorPanel() {
         </div>
         <h3 className="text-sm font-semibold text-slate-100 mt-1">{ecu.name}</h3>
         <p className="text-[10px] font-mono text-cyan-400/70">{ecu.shortName}</p>
+        <p className="text-[9px] text-slate-600 mt-0.5">
+          {ecu.domain} / {getZoneLabel(getVehicleZone(ecu.id))}
+        </p>
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
@@ -160,6 +165,8 @@ export function InspectorPanel() {
             ))}
           </div>
         </InspectorSection>
+
+        <EcuInspectorActions ecu={ecu} />
       </div>
     </aside>
   );

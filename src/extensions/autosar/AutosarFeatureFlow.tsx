@@ -15,7 +15,7 @@ import { GlassPanel } from '@/components/ui/GlassPanel';
 import { cn } from '@/lib/utils';
 import type { SimulationFeature } from '@/types/simulation';
 
-export function AutosarFeatureFlow({ feature }: { feature: SimulationFeature }) {
+export function AutosarFeatureFlow({ feature, compact }: { feature: SimulationFeature; compact?: boolean }) {
   const currentStepIndex = useAppStore((s) => s.currentStepIndex);
   const featureTab = useAppStore((s) => s.featureTab);
   const openExplainWhy = useAppStore((s) => s.openExplainWhy);
@@ -28,7 +28,8 @@ export function AutosarFeatureFlow({ feature }: { feature: SimulationFeature }) 
   const simRxIdx = resolveAutosarLayerIndex(layerId, AUTOSAR_RX_PIPELINE);
 
   useEffect(() => {
-    if (featureTab !== 'autosar-stack' || currentStepIndex >= 0) return;
+    const isAutosarTab = featureTab === 'autosar-stack' || featureTab === 'integrated';
+    if (!isAutosarTab || currentStepIndex >= 0) return;
     const interval = setInterval(() => {
       setDemoTx((p) => (p + 1) % AUTOSAR_LAYER_PIPELINE.length);
       setDemoRx((p) => (p + 1) % AUTOSAR_RX_PIPELINE.length);
@@ -50,19 +51,19 @@ export function AutosarFeatureFlow({ feature }: { feature: SimulationFeature }) 
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      {/* Header */}
-      <div className="shrink-0 px-4 py-2 border-b border-cyan-500/10 bg-slate-900/50">
-        <h3 className="text-sm font-semibold text-slate-100">{feature.name} — AUTOSAR Signal Path</h3>
-        <p className="text-[10px] text-slate-500">
-          {isLive
-            ? `Live sync: Step ${currentStep?.stepNumber} — ${currentStep?.title}`
-            : 'Preview mode: layers auto-cycle until simulation plays'}
-        </p>
-      </div>
+      {!compact && (
+        <div className="shrink-0 px-4 py-2 border-b border-cyan-500/10 bg-slate-900/50">
+          <h3 className="text-sm font-semibold text-slate-100">{feature.name} — AUTOSAR Signal Path</h3>
+          <p className="text-[10px] text-slate-500">
+            {isLive
+              ? `Live sync: Step ${currentStep?.stepNumber} — ${currentStep?.title}`
+              : 'Preview mode: layers auto-cycle until simulation plays'}
+          </p>
+        </div>
+      )}
 
       <div className="flex flex-1 min-h-0">
-        {/* Pipeline — horizontal scroll, all layers visible */}
-        <div className="flex-1 min-h-0 flex flex-col p-3 gap-3 overflow-hidden">
+        <div className={cn('flex-1 min-h-0 flex flex-col p-3 gap-3 overflow-hidden', compact && 'p-2 gap-2')}>
           <PipelineSection
             title="Transmit Path (Sender ECU)"
             layers={AUTOSAR_LAYER_PIPELINE}
@@ -112,6 +113,7 @@ export function AutosarFeatureFlow({ feature }: { feature: SimulationFeature }) 
         </div>
 
         {/* Layer detail — feature-specific */}
+        {!compact && (
         <div className="w-72 shrink-0 border-l border-cyan-500/10 p-3 overflow-y-auto custom-scrollbar bg-slate-900/30">
           <LayerDetailPanel
             layerKey={activeLayerMeta.key}
@@ -121,6 +123,7 @@ export function AutosarFeatureFlow({ feature }: { feature: SimulationFeature }) 
             signalStages={signalStages}
           />
         </div>
+        )}
       </div>
     </div>
   );
