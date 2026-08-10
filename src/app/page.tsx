@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { HeaderBar } from '@/components/HeaderBar';
 import { Sidebar } from '@/components/Sidebar';
 import { InspectorPanel } from '@/components/InspectorPanel';
-import { ArchitectureView } from '@/components/ArchitectureView';
+import { ArchitectureViewEnhancement } from '@/extensions/architecture/ArchitectureViewEnhancement';
 import { AutosarExplorer } from '@/components/AutosarExplorer';
 import { FeatureSimulation } from '@/components/FeatureSimulation';
 import { useAppStore } from '@/lib/store';
@@ -20,7 +20,7 @@ function CenterView() {
     case 'feature':
       return <FeatureSimulation />;
     default:
-      return <ArchitectureView />;
+      return <ArchitectureViewEnhancement />;
   }
 }
 

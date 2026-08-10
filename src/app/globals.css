@@ -214,3 +214,60 @@ body {
   color: #94a3b8;
   border: 1px solid rgba(148, 163, 184, 0.3);
 }
+
+/* Homepage zone architecture — CSS-only edge animation */
+.vv-zone-architecture {
+  background: #080a0e;
+}
+
+.vv-zone-backbone-pulse {
+  animation: vv-backbone-flow 2.8s linear infinite;
+}
+
+.vv-zone-peripheral-pulse {
+  animation: vv-peripheral-flow 3.6s linear infinite;
+}
+
+.vv-zone-peripheral-pulse-strong {
+  animation: vv-peripheral-flow-strong 1.6s linear infinite;
+}
+
+@keyframes vv-backbone-flow {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+
+@keyframes vv-peripheral-flow {
+  to {
+    stroke-dashoffset: -25;
+  }
+}
+
+@keyframes vv-peripheral-flow-strong {
+  to {
+    stroke-dashoffset: -42;
+  }
+}
+
+.vv-zone-node-pulse {
+  animation: vv-node-glow 2.2s ease-in-out infinite;
+}
+
+@keyframes vv-node-glow {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.15);
+  }
+}
+
+.vv-zone-architecture .react-flow__pane {
+  cursor: grab;
+}
+
+.vv-zone-architecture .react-flow__pane:active {
+  cursor: grabbing;
+}
