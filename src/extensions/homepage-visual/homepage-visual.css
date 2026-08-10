@@ -9,11 +9,81 @@
 .homepage-architecture.engineering-bg {
   background-color: #070b12;
   background-image:
-    linear-gradient(rgba(0, 212, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 212, 255, 0.025) 1px, transparent 1px),
-    radial-gradient(ellipse 80% 55% at 50% 42%, rgba(0, 212, 255, 0.07) 0%, transparent 70%),
-    radial-gradient(ellipse 100% 80% at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.45) 100%);
-  background-size: 48px 48px, 48px 48px, 100% 100%, 100% 100%;
+    linear-gradient(rgba(0, 212, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.02) 1px, transparent 1px),
+    radial-gradient(ellipse 85% 60% at 50% 44%, rgba(0, 212, 255, 0.05) 0%, transparent 72%);
+  background-size: 48px 48px, 48px 48px, 100% 100%;
+}
+
+/* Vehicle silhouette — beneath React Flow */
+.homepage-architecture .hp-vehicle-silhouette {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2% 4%;
+}
+
+.homepage-architecture .hp-vehicle-svg {
+  width: 100%;
+  height: 100%;
+  max-width: 1180px;
+  max-height: 100%;
+}
+
+.homepage-architecture .hp-vehicle-body {
+  stroke-width: 1.5;
+}
+
+.homepage-architecture .hp-vehicle-cockpit {
+  fill: rgba(56, 189, 248, 0.04);
+  stroke: rgba(56, 189, 248, 0.12);
+  stroke-width: 1;
+  stroke-dasharray: 4 6;
+}
+
+.homepage-architecture .hp-wheel-well {
+  fill: rgba(7, 11, 18, 0.65);
+  stroke: rgba(100, 116, 139, 0.22);
+  stroke-width: 1;
+}
+
+.homepage-architecture .hp-zone-divider {
+  stroke: rgba(56, 189, 248, 0.08);
+  stroke-width: 1;
+  stroke-dasharray: 4 8;
+}
+
+.homepage-architecture .hp-zone-label {
+  fill: rgba(148, 163, 184, 0.42);
+  font-family: ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+.homepage-architecture .hp-orient-label {
+  fill: rgba(148, 163, 184, 0.5);
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-anchor: middle;
+  font-weight: 600;
+}
+
+.homepage-architecture .hp-orient-front {
+  fill: rgba(56, 189, 248, 0.55);
+}
+
+.homepage-architecture .hp-orient-arrow-front {
+  fill: rgba(56, 189, 248, 0.4);
+}
+
+.homepage-architecture .hp-orient-arrow-rear {
+  fill: rgba(100, 116, 139, 0.35);
 }
 
 .homepage-architecture .hp-vignette {
@@ -21,34 +91,104 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: radial-gradient(ellipse 75% 65% at 50% 48%, transparent 35%, rgba(0, 0, 0, 0.42) 100%);
+  background: radial-gradient(ellipse 80% 70% at 50% 48%, transparent 42%, rgba(0, 0, 0, 0.28) 100%);
+}
+
+/* React Flow layering — edges behind ECU cards */
+.homepage-architecture .homepage-architecture-flow {
+  z-index: 2;
+}
+
+.homepage-architecture .homepage-architecture-flow .react-flow__edges {
+  z-index: 0;
+}
+
+.homepage-architecture .homepage-architecture-flow .react-flow__nodes {
+  z-index: 2;
 }
 
 /* Glass ECU cards — homepage only (outer node shell only) */
 .homepage-architecture .react-flow__node > div {
   border-radius: 10px !important;
+  min-width: 112px !important;
+  max-width: 130px !important;
   box-shadow:
-    0 4px 18px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* Subtle idle edge pulse — CSS only, no React state loops */
 .homepage-architecture .homepage-architecture-flow .react-flow__edge-path {
-  stroke-linecap: square;
-  stroke-linejoin: miter;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .homepage-architecture .homepage-architecture-flow:not(.hp-simulation-active) .react-flow__edge:not(.react-flow__edge-animated) .react-flow__edge-path {
-  stroke-dasharray: 6 10;
-  animation: hp-edge-idle 3.5s linear infinite;
+  stroke-dasharray: 5 12;
+  animation: hp-edge-idle 4s linear infinite;
 }
 
 @keyframes hp-edge-idle {
   to {
-    stroke-dashoffset: -32;
+    stroke-dashoffset: -34;
   }
+}
+
+/* Compact network legend */
+.homepage-architecture .hp-network-legend {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  padding: 7px 9px;
+  border-radius: 8px;
+  max-width: 148px;
+  border-color: var(--hp-border);
+  background: rgba(10, 16, 28, 0.88);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+
+.homepage-architecture .hp-network-legend-title {
+  font-size: 8px;
+  font-weight: 600;
+  color: rgba(100, 116, 139, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 5px;
+}
+
+.homepage-architecture .hp-network-legend-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.homepage-architecture .hp-network-legend-item {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  align-items: center;
+  gap: 5px;
+}
+
+.homepage-architecture .hp-network-swatch {
+  width: 10px;
+  height: 4px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.homepage-architecture .hp-network-name {
+  font-size: 9px;
+  color: rgba(148, 163, 184, 0.88);
+  line-height: 1.2;
+}
+
+.homepage-architecture .hp-network-rate {
+  font-size: 8px;
+  font-family: ui-monospace, monospace;
+  color: rgba(71, 85, 105, 0.95);
 }
 
 /* Controls & minimap polish */
@@ -67,6 +207,8 @@
 }
 
 .homepage-architecture .hp-flow-minimap {
+  width: 200px !important;
+  height: 148px !important;
   border-radius: 10px !important;
   border: 1px solid var(--hp-border) !important;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);

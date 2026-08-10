@@ -16,7 +16,7 @@ export function HomeFitViewButton() {
   const { fitView } = useReactFlow();
 
   const onFit = useCallback(() => {
-    fitView({ padding: 0.12, duration: 320 });
+    fitView({ padding: 0.08, maxZoom: 1.12, duration: 320 });
   }, [fitView]);
 
   return (

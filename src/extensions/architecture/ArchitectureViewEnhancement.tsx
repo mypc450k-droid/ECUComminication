@@ -15,12 +15,13 @@ import '@xyflow/react/dist/style.css';
 import { useAppStore } from '@/lib/store';
 import { ecus, getFeatureById } from '@/lib/data';
 import { ECUNode, type ECUNodeData } from '@/components/ECUNode';
-import { NetworkLegend } from '@/components/NetworkLegend';
 import { useExtensionStore } from '../store/extensionStore';
 import { HomeVehicleSilhouette } from '@/extensions/homepage-visual/HomeVehicleSilhouette';
 import { HomeFitViewButton, HomeDirectionPill } from '@/extensions/homepage-visual/HomeArchitectureChrome';
+import { HomeNetworkLegend } from '@/extensions/homepage-visual/HomeNetworkLegend';
 import '@/extensions/homepage-visual/homepage-visual.css';
-import { getVehicleLayoutPosition } from './vehicleZoneLayout';
+import { getHomepageLayoutPosition as getVehicleLayoutPosition } from '@/extensions/homepage-visual/homepageZoneLayout';
+import { getVehicleZone } from './vehicleZoneLayout';
 import { buildPartnerEdges, getConnectedEcuIds } from './buildPartnerEdges';
 
 const nodeTypes = { ecuNode: ECUNode };
@@ -176,7 +177,7 @@ export function ArchitectureViewEnhancement() {
         onNodeDoubleClick={onNodeDoubleClick}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: 0.12 }}
+        fitViewOptions={{ padding: 0.08, maxZoom: 1.12 }}
         minZoom={0.35}
         maxZoom={2}
         proOptions={{ hideAttribution: true }}
@@ -196,19 +197,21 @@ export function ArchitectureViewEnhancement() {
               position="bottom-right"
               className="hp-flow-minimap !bg-slate-950/90 !border-cyan-500/15 !bottom-3 !right-3"
               nodeColor={(node) => {
-                const id = node.id;
-                if (id.includes('door') || id.includes('pw')) return '#334155';
-                if (['camera', 'radar', 'adas', 'ultrasonic', 'lighting'].includes(id)) return '#0e7490';
-                if (['engine', 'bms', 'transmission', 'motor-controller', 'inverter', 'charging'].includes(id)) return '#1d4ed8';
-                if (['abs', 'esp', 'steering', 'epb'].includes(id)) return '#7c3aed';
-                return '#1e293b';
+                const zone = getVehicleZone(node.id);
+                if (zone === 'front') return '#38bdf8';
+                if (zone === 'cabin') return '#a78bfa';
+                if (zone === 'powertrain') return '#fbbf24';
+                if (zone === 'chassis') return '#34d399';
+                return '#475569';
               }}
-              maskColor="rgba(4,8,16,0.72)"
+              maskColor="rgba(2, 6, 23, 0.78)"
+              pannable
+              zoomable
             />
           </>
         )}
       </ReactFlow>
-      <NetworkLegend />
+      <HomeNetworkLegend />
     </div>
   );
 }
