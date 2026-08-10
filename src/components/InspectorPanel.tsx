@@ -29,7 +29,7 @@ export function InspectorPanel() {
 
   if (!ecu) {
     return (
-      <aside className="w-72 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
+      <aside className="w-full h-full min-h-0 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
         <div className="p-3 border-b border-cyan-500/10">
           <h2 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
             Inspector
@@ -52,7 +52,7 @@ export function InspectorPanel() {
   }
 
   return (
-    <aside className="w-72 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
+    <aside className="w-full h-full min-h-0 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
       <div className="p-3 border-b border-cyan-500/10">
         <div className="flex items-center justify-between">
           <h2 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
@@ -67,7 +67,7 @@ export function InspectorPanel() {
         </p>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-3">
         <InspectorSection title="Description">
           <p className="text-xs text-slate-400 leading-relaxed">{ecu.description}</p>
         </InspectorSection>
@@ -105,6 +105,13 @@ export function InspectorPanel() {
             ))}
           </div>
         </InspectorSection>
+
+        {ecuExplanation && (
+          <ArchitectureExplainSection
+            selectionKey={`ecu:${ecu.id}`}
+            explanation={ecuExplanation}
+          />
+        )}
 
         <InspectorSection title="CAN IDs">
           <div className="flex flex-wrap gap-1">
@@ -170,13 +177,6 @@ export function InspectorPanel() {
         </InspectorSection>
 
         <EcuInspectorActions ecu={ecu} />
-
-        {ecuExplanation && (
-          <ArchitectureExplainSection
-            selectionKey={`ecu:${ecu.id}`}
-            explanation={ecuExplanation}
-          />
-        )}
       </div>
     </aside>
   );
@@ -217,13 +217,13 @@ function AutosarInspector({ layerId }: { layerId: string }) {
   if (!layer) return null;
 
   return (
-    <aside className="w-72 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
+    <aside className="w-full h-full min-h-0 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
       <div className="p-3 border-b border-cyan-500/10">
         <h2 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">AUTOSAR Layer</h2>
         <h3 className="text-sm font-semibold text-slate-100 mt-1">{layer.name}</h3>
         <p className="text-[10px] font-mono text-cyan-400/70">{layer.shortName}</p>
       </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-3">
         <InspectorSection title="Purpose">
           <p className="text-xs text-slate-400 leading-relaxed">{layer.purpose}</p>
         </InspectorSection>
@@ -282,12 +282,12 @@ function FeatureInspector({ featureId }: { featureId: string }) {
   const featureExplanation = buildFeatureArchitectureExplanation(feature);
 
   return (
-    <aside className="w-72 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
+    <aside className="w-full h-full min-h-0 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
       <div className="p-3 border-b border-cyan-500/10">
         <h2 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Feature</h2>
         <h3 className="text-sm font-semibold text-slate-100 mt-1">{feature.name}</h3>
       </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-3">
         <InspectorSection title="Description">
           <p className="text-xs text-slate-400 leading-relaxed">{feature.description}</p>
         </InspectorSection>
