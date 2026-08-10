@@ -214,3 +214,64 @@ body {
   color: #94a3b8;
   border: 1px solid rgba(148, 163, 184, 0.3);
 }
+
+/* Homepage architecture — CSS-only edge animation (no React state loops) */
+.vv-home-architecture {
+  background: #070b12;
+}
+
+.vv-home-edge-ambient {
+  animation: vv-home-flow 4s linear infinite;
+}
+
+.vv-home-edge-strong {
+  animation: vv-home-flow-strong 1.6s linear infinite;
+}
+
+@keyframes vv-home-flow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+@keyframes vv-home-flow-strong {
+  to {
+    stroke-dashoffset: -38;
+  }
+}
+
+.vv-home-ecu-active {
+  animation: vv-home-ecu-glow 2s ease-in-out infinite;
+}
+
+@keyframes vv-home-ecu-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(0, 212, 255, 0.4);
+  }
+}
+
+.vv-home-autosar-dot {
+  animation: vv-home-dot 2.5s ease-in-out infinite;
+}
+
+@keyframes vv-home-dot {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.vv-home-architecture .react-flow__pane {
+  cursor: grab;
+}
+
+.vv-home-architecture .react-flow__pane:active {
+  cursor: grabbing;
+}
