@@ -1,0 +1,131 @@
+/* Scoped homepage architecture presentation — does not affect simulation / AUTOSAR views */
+
+.homepage-architecture {
+  --hp-accent: rgba(0, 212, 255, 0.55);
+  --hp-surface: rgba(15, 23, 42, 0.55);
+  --hp-border: rgba(56, 189, 248, 0.14);
+}
+
+.homepage-architecture.engineering-bg {
+  background-color: #070b12;
+  background-image:
+    linear-gradient(rgba(0, 212, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.025) 1px, transparent 1px),
+    radial-gradient(ellipse 80% 55% at 50% 42%, rgba(0, 212, 255, 0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 100% 80% at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.45) 100%);
+  background-size: 48px 48px, 48px 48px, 100% 100%, 100% 100%;
+}
+
+.homepage-architecture .hp-vignette {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(ellipse 75% 65% at 50% 48%, transparent 35%, rgba(0, 0, 0, 0.42) 100%);
+}
+
+/* Glass ECU cards — homepage only (outer node shell only) */
+.homepage-architecture .react-flow__node > div {
+  border-radius: 10px !important;
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Subtle idle edge pulse — CSS only, no React state loops */
+.homepage-architecture .homepage-architecture-flow .react-flow__edge-path {
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+
+.homepage-architecture .homepage-architecture-flow:not(.hp-simulation-active) .react-flow__edge:not(.react-flow__edge-animated) .react-flow__edge-path {
+  stroke-dasharray: 6 10;
+  animation: hp-edge-idle 3.5s linear infinite;
+}
+
+@keyframes hp-edge-idle {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+
+/* Controls & minimap polish */
+.homepage-architecture .hp-flow-controls.react-flow__controls {
+  background: rgba(10, 16, 28, 0.92) !important;
+  border: 1px solid var(--hp-border) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.homepage-architecture .hp-flow-controls .react-flow__controls-button {
+  border-bottom-color: rgba(56, 189, 248, 0.08) !important;
+  width: 28px !important;
+  height: 28px !important;
+}
+
+.homepage-architecture .hp-flow-minimap {
+  border-radius: 10px !important;
+  border: 1px solid var(--hp-border) !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.homepage-architecture .hp-flow-minimap .react-flow__minimap-mask {
+  fill: rgba(4, 8, 16, 0.72);
+}
+
+.homepage-architecture > .glass-panel {
+  border-color: var(--hp-border);
+  background: rgba(10, 16, 28, 0.82);
+}
+
+.homepage-architecture .hp-fit-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  letter-spacing: 0.04em;
+  color: rgba(148, 163, 184, 0.95);
+  background: rgba(10, 16, 28, 0.9);
+  border: 1px solid var(--hp-border);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.homepage-architecture .hp-fit-btn:hover {
+  color: var(--accent-cyan, #00d4ff);
+  border-color: rgba(0, 212, 255, 0.35);
+  background: rgba(0, 212, 255, 0.08);
+}
+
+.homepage-architecture .hp-fit-btn svg {
+  width: 12px;
+  height: 12px;
+  opacity: 0.85;
+}
+
+.homepage-architecture .hp-direction-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  letter-spacing: 0.12em;
+  color: rgba(148, 163, 184, 0.7);
+  background: rgba(10, 16, 28, 0.75);
+  border: 1px solid rgba(56, 189, 248, 0.1);
+}
+
+.homepage-architecture .hp-direction-pill .hp-arrow {
+  color: rgba(0, 212, 255, 0.55);
+  font-size: 11px;
+  line-height: 1;
+}

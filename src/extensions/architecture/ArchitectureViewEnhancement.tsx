@@ -17,7 +17,9 @@ import { ecus, getFeatureById } from '@/lib/data';
 import { ECUNode, type ECUNodeData } from '@/components/ECUNode';
 import { NetworkLegend } from '@/components/NetworkLegend';
 import { useExtensionStore } from '../store/extensionStore';
-import { VehicleSilhouette } from './VehicleSilhouette';
+import { HomeVehicleSilhouette } from '@/extensions/homepage-visual/HomeVehicleSilhouette';
+import { HomeFitViewButton, HomeDirectionPill } from '@/extensions/homepage-visual/HomeArchitectureChrome';
+import '@/extensions/homepage-visual/homepage-visual.css';
 import { getVehicleLayoutPosition } from './vehicleZoneLayout';
 import { buildPartnerEdges, getConnectedEcuIds } from './buildPartnerEdges';
 
@@ -157,8 +159,9 @@ export function ArchitectureViewEnhancement() {
   );
 
   return (
-    <div className="relative w-full h-full engineering-bg">
-      <VehicleSilhouette />
+    <div className="relative w-full h-full engineering-bg homepage-architecture">
+      <HomeVehicleSilhouette />
+      <div className="hp-vignette" aria-hidden />
       {presentationMode && (
         <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 px-4 py-1.5 rounded-full bg-slate-900/80 border border-cyan-500/20 text-[10px] text-cyan-300/80 font-mono">
           Illustrative Vehicle E/E Topology
@@ -177,17 +180,30 @@ export function ArchitectureViewEnhancement() {
         minZoom={0.35}
         maxZoom={2}
         proOptions={{ hideAttribution: true }}
-        className="bg-transparent"
+        className={`bg-transparent homepage-architecture-flow${isSimulationRunning ? ' hp-simulation-active' : ''}`}
       >
-        <Background color="rgba(0,212,255,0.03)" gap={40} size={1} />
+        <Background color="rgba(0,212,255,0.025)" gap={48} size={1} />
         {!presentationMode && (
           <>
-            <Controls position="bottom-left" showInteractive={false} />
+            <HomeDirectionPill />
+            <Controls
+              position="bottom-left"
+              showInteractive={false}
+              className="hp-flow-controls !left-3 !bottom-14"
+            />
+            <HomeFitViewButton />
             <MiniMap
               position="bottom-right"
-              className="!bg-slate-900/80 !border-cyan-500/10"
-              nodeColor={() => '#1e293b'}
-              maskColor="rgba(0,0,0,0.6)"
+              className="hp-flow-minimap !bg-slate-950/90 !border-cyan-500/15 !bottom-3 !right-3"
+              nodeColor={(node) => {
+                const id = node.id;
+                if (id.includes('door') || id.includes('pw')) return '#334155';
+                if (['camera', 'radar', 'adas', 'ultrasonic', 'lighting'].includes(id)) return '#0e7490';
+                if (['engine', 'bms', 'transmission', 'motor-controller', 'inverter', 'charging'].includes(id)) return '#1d4ed8';
+                if (['abs', 'esp', 'steering', 'epb'].includes(id)) return '#7c3aed';
+                return '#1e293b';
+              }}
+              maskColor="rgba(4,8,16,0.72)"
             />
           </>
         )}
