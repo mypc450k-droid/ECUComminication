@@ -6,29 +6,33 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { ECUNodeData } from '@/components/ECUNode';
 import { AsilBadge, NetworkBadge } from '@/components/ui/Badges';
+import { useHomepageNodeVisual } from './HomepageInteractionContext';
 
 /** Homepage-only ECU module — engineering architecture card styling. */
 function HomeECUNodeComponent({ data, id }: NodeProps) {
   const nodeData = data as ECUNodeData & { dimmed?: boolean };
   const { ecu, selected, highlighted, activeInFlow, dimmed } = nodeData;
+  const { hoverDimmed, hoverHighlighted } = useHomepageNodeVisual(ecu.id);
   const isGateway = id === 'gateway' || ecu.id === 'gateway';
   const title = isGateway ? ecu.name : ecu.shortName;
   const networks = isGateway ? ecu.networks : ecu.networks.slice(0, 4);
+  const visualDimmed = dimmed || hoverDimmed;
+  const visualHighlighted = highlighted || hoverHighlighted;
 
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.92 }}
       animate={{
-        opacity: dimmed ? 0.22 : 1,
+        opacity: visualDimmed ? 0.28 : 1,
         scale: activeInFlow ? 1.04 : selected ? 1.02 : 1,
       }}
-      transition={{ duration: 0.25, type: 'spring', stiffness: 320 }}
+      transition={{ duration: 0.2, type: 'spring', stiffness: 320 }}
       className={cn(
         'hp-ecu-module relative cursor-pointer overflow-hidden rounded-md border transition-all duration-200',
         isGateway && 'hp-ecu-gateway',
         selected
           ? 'border-cyan-400/70 shadow-[0_0_16px_rgba(0,212,255,0.25)]'
-          : highlighted
+          : visualHighlighted
             ? 'border-cyan-500/45 shadow-[0_0_10px_rgba(0,212,255,0.12)]'
             : 'border-slate-600/55',
         activeInFlow && 'border-cyan-400 animate-pulse-glow'

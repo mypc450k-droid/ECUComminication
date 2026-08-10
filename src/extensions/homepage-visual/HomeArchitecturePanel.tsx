@@ -1,28 +1,55 @@
 'use client';
 
 import { networks } from '@/lib/data';
-
-const FEATURE_HIGHLIGHTS = [
-  'Clear segregation of functional domains',
-  'Central gateway cross-domain routing',
-  'Multi-protocol vehicle backbone',
-  'ASIL-aware safety architecture',
-  'AUTOSAR Classic platform integration',
-] as const;
+import { computeArchitectureInsights, computeArchitectureSummary } from './homepageGraphUtils';
 
 export function HomeArchitecturePanel() {
+  const summary = computeArchitectureSummary();
+  const insights = computeArchitectureInsights();
+
   return (
     <aside className="hp-right-panel" aria-label="Architecture summary">
       <section className="hp-right-section">
-        <h4 className="hp-panel-heading">Feature Highlights</h4>
-        <ul className="hp-check-list">
-          {FEATURE_HIGHLIGHTS.map((item) => (
-            <li key={item}>
-              <span className="hp-check-icon" aria-hidden>✓</span>
-              <span>{item}</span>
-            </li>
-          ))}
+        <h4 className="hp-panel-heading">Architecture Summary</h4>
+        <ul className="hp-summary-stats">
+          <li><span>ECUs</span><span>{summary.ecuCount}</span></li>
+          <li><span>Networks</span><span>{summary.networkCount}</span></li>
+          <li><span>Features</span><span>{summary.featureCount}</span></li>
         </ul>
+        <div className="hp-summary-block">
+          <span className="hp-summary-block-title">ASIL</span>
+          <ul className="hp-summary-mini">
+            {(Object.entries(summary.asilCounts) as [string, number][]).map(([level, count]) => (
+              <li key={level}><span>ASIL {level}</span><span>{count}</span></li>
+            ))}
+          </ul>
+        </div>
+        <div className="hp-summary-block">
+          <span className="hp-summary-block-title">Network ECUs</span>
+          <ul className="hp-summary-mini">
+            <li><span>CAN HS</span><span>{summary.networkTypeCounts.CAN_HS}</span></li>
+            <li><span>CAN LS</span><span>{summary.networkTypeCounts.CAN_LS}</span></li>
+            <li><span>LIN</span><span>{summary.networkTypeCounts.LIN}</span></li>
+            <li><span>ETHERNET</span><span>{summary.networkTypeCounts.Ethernet}</span></li>
+            <li><span>FLEXRAY</span><span>{summary.networkTypeCounts.FlexRay}</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section className="hp-right-section">
+        <h4 className="hp-panel-heading">Architecture Insights</h4>
+        {insights.length === 0 ? (
+          <p className="hp-insights-empty">NO ADDITIONAL INSIGHTS</p>
+        ) : (
+          <ul className="hp-check-list">
+            {insights.map((item) => (
+              <li key={item}>
+                <span className="hp-check-icon" aria-hidden>✓</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section className="hp-right-section">
@@ -35,23 +62,6 @@ export function HomeArchitecturePanel() {
             </li>
           ))}
         </ul>
-      </section>
-
-      <section className="hp-right-section">
-        <h4 className="hp-panel-heading">ECU Placement</h4>
-        <svg className="hp-side-profile" viewBox="0 0 120 48" aria-hidden>
-          <path
-            d="M 8 32 Q 20 12 60 10 Q 100 12 112 32 L 108 38 Q 60 44 12 38 Z"
-            className="hp-side-profile-body"
-          />
-          <circle cx="28" cy="34" r="5" className="hp-side-profile-wheel" />
-          <circle cx="92" cy="34" r="5" className="hp-side-profile-wheel" />
-          <circle cx="22" cy="22" r="2.5" className="hp-side-profile-ecu hp-ecu-front" />
-          <circle cx="60" cy="20" r="2.5" className="hp-side-profile-ecu hp-ecu-cabin" />
-          <circle cx="78" cy="28" r="2.5" className="hp-side-profile-ecu hp-ecu-power" />
-          <circle cx="48" cy="32" r="2.5" className="hp-side-profile-ecu hp-ecu-chassis" />
-        </svg>
-        <p className="hp-side-profile-note">Side-view ECU density reference</p>
       </section>
     </aside>
   );
