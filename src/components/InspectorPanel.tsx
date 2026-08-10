@@ -7,6 +7,8 @@ import { EcuInspectorActions } from '@/extensions/panels/EcuInspectorActions';
 import { getVehicleZone, getZoneLabel } from '@/extensions/architecture/vehicleZoneLayout';
 import { GlassPanel } from './ui/GlassPanel';
 import { AsilBadge, NetworkBadge } from './ui/Badges';
+import { ArchitectureExplainSection } from './ArchitectureExplainSection';
+import { buildEcuArchitectureExplanation, buildFeatureArchitectureExplanation } from '@/extensions/inspector/architectureExplain';
 import { cn } from '@/lib/utils';
 
 export function InspectorPanel() {
@@ -15,6 +17,7 @@ export function InspectorPanel() {
   const selectedAutosarLayerId = useAppStore((s) => s.selectedAutosarLayerId);
   const viewMode = useAppStore((s) => s.viewMode);
   const ecu = selectedEcuId ? getEcuById(selectedEcuId) : null;
+  const ecuExplanation = ecu ? buildEcuArchitectureExplanation(ecu) : null;
 
   if (viewMode === 'autosar' && selectedAutosarLayerId) {
     return <AutosarInspector layerId={selectedAutosarLayerId} />;
@@ -167,6 +170,13 @@ export function InspectorPanel() {
         </InspectorSection>
 
         <EcuInspectorActions ecu={ecu} />
+
+        {ecuExplanation && (
+          <ArchitectureExplainSection
+            selectionKey={`ecu:${ecu.id}`}
+            explanation={ecuExplanation}
+          />
+        )}
       </div>
     </aside>
   );
@@ -269,6 +279,8 @@ function FeatureInspector({ featureId }: { featureId: string }) {
 
   if (!feature) return null;
 
+  const featureExplanation = buildFeatureArchitectureExplanation(feature);
+
   return (
     <aside className="w-72 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
       <div className="p-3 border-b border-cyan-500/10">
@@ -301,6 +313,11 @@ function FeatureInspector({ featureId }: { featureId: string }) {
             ))}
           </div>
         </InspectorSection>
+
+        <ArchitectureExplainSection
+          selectionKey={`feature:${feature.id}`}
+          explanation={featureExplanation}
+        />
 
         <motion.button
           onClick={() => isSimulationRunning ? stopSimulation() : startSimulation()}
