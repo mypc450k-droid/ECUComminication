@@ -64,6 +64,52 @@ export function getTraceEdgeIds(pathEcuIds: string[], edges: Edge[]): string[] {
   return traceIds;
 }
 
+export interface TraceEdgeAnimationMeta {
+  edgeIds: string[];
+  reverseByEdgeId: Record<string, boolean>;
+  hopIndexByEdgeId: Record<string, number>;
+}
+
+const EMPTY_TRACE_ANIMATION_META: TraceEdgeAnimationMeta = {
+  edgeIds: [],
+  reverseByEdgeId: {},
+  hopIndexByEdgeId: {},
+};
+
+/** Per-hop direction metadata for trace pulse animation along existing edges. */
+export function getTraceEdgeAnimationMeta(
+  pathEcuIds: string[],
+  edges: Edge[]
+): TraceEdgeAnimationMeta {
+  if (pathEcuIds.length < 2) return EMPTY_TRACE_ANIMATION_META;
+
+  const edgeByPair = new Map<string, Edge>();
+  for (const edge of edges) {
+    const pairKey = [edge.source, edge.target].sort().join('|');
+    if (!edgeByPair.has(pairKey)) {
+      edgeByPair.set(pairKey, edge);
+    }
+  }
+
+  const edgeIds: string[] = [];
+  const reverseByEdgeId: Record<string, boolean> = {};
+  const hopIndexByEdgeId: Record<string, number> = {};
+
+  for (let i = 0; i < pathEcuIds.length - 1; i += 1) {
+    const from = pathEcuIds[i];
+    const to = pathEcuIds[i + 1];
+    const pairKey = [from, to].sort().join('|');
+    const edge = edgeByPair.get(pairKey);
+    if (!edge) continue;
+
+    edgeIds.push(edge.id);
+    hopIndexByEdgeId[edge.id] = i;
+    reverseByEdgeId[edge.id] = edge.source === to && edge.target === from;
+  }
+
+  return { edgeIds, reverseByEdgeId, hopIndexByEdgeId };
+}
+
 export function buildPathSummary(pathIds: string[]): string[] {
   return pathIds.map((id) => {
     const ecu = ecus.find((e) => e.id === id);

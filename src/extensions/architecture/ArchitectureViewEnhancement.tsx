@@ -33,15 +33,16 @@ import { HomepageGuidedTour } from '@/extensions/homepage-visual/HomepageGuidedT
 import { HomepageFocusController } from '@/extensions/homepage-visual/HomepageFocusController';
 import { HomepagePresentationBar } from '@/extensions/homepage-visual/HomepagePresentationBar';
 import '@/extensions/homepage-visual/homepage-visual.css';
-import { getTraceEdgeIds } from '@/extensions/homepage-visual/homepageGraphUtils';
+import { HomeSmoothStepEdge } from '@/extensions/homepage-visual/HomeSmoothStepEdge';
+import { getTraceEdgeAnimationMeta } from '@/extensions/homepage-visual/homepageGraphUtils';
 import { getHomepageLayoutPosition as getVehicleLayoutPosition } from '@/extensions/homepage-visual/homepageZoneLayout';
 import { getVehicleZone } from './vehicleZoneLayout';
 import { buildPartnerEdges, getConnectedEcuIds } from './buildPartnerEdges';
 
 const nodeTypes = { ecuNode: HomeECUNode };
+const edgeTypes = { smoothstep: HomeSmoothStepEdge };
 const EMPTY_CONNECTED_IDS: string[] = [];
 const EMPTY_RELEVANT_IDS: string[] = [];
-const EMPTY_TRACE_EDGE_IDS: string[] = [];
 
 export function ArchitectureViewEnhancement() {
   return (
@@ -147,10 +148,11 @@ function ArchitectureViewEnhancementInner() {
   const initialEdges = useMemo(() => buildPartnerEdges(ecus), []);
 
   const tracePathKey = tracePathIds.join('|');
-  const traceEdgeIds = useMemo(() => {
-    if (tracePathIds.length < 2) return EMPTY_TRACE_EDGE_IDS;
-    return getTraceEdgeIds(tracePathIds, initialEdges);
-  }, [tracePathKey, initialEdges]);
+  const traceAnimationMeta = useMemo(
+    () => getTraceEdgeAnimationMeta(tracePathIds, initialEdges),
+    [tracePathKey, initialEdges]
+  );
+  const traceEdgeIds = traceAnimationMeta.edgeIds;
   const traceEdgeIdKey = traceEdgeIds.join('|');
   const traceEdgeIdSet = useMemo(() => new Set(traceEdgeIds), [traceEdgeIdKey]);
   const isTracePathActive = tracePathIds.length >= 2 && traceEdgeIds.length > 0;
@@ -222,8 +224,16 @@ function ArchitectureViewEnhancementInner() {
 
           return {
             ...e,
-            animated: isTraceEdge,
+            animated: false,
             className: isTraceEdge ? 'hp-trace-edge' : undefined,
+            data: isTraceEdge
+              ? {
+                  ...e.data,
+                  isTraceEdge: true,
+                  traceReverse: traceAnimationMeta.reverseByEdgeId[e.id] ?? false,
+                  traceHopIndex: traceAnimationMeta.hopIndexByEdgeId[e.id] ?? 0,
+                }
+              : e.data,
             style: {
               ...e.style,
               strokeWidth: isTraceEdge ? 2.4 : baseStrokeWidth,
@@ -246,6 +256,7 @@ function ArchitectureViewEnhancementInner() {
     isTracePathActive,
     traceEdgeIdKey,
     traceEdgeIdSet,
+    traceAnimationMeta,
   ]);
 
   const onNodeClick = useCallback(
@@ -327,6 +338,7 @@ function ArchitectureViewEnhancementInner() {
             onNodeMouseMove={onNodeMouseMove}
             onNodeMouseLeave={onNodeMouseLeave}
             nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
             fitView
             fitViewOptions={{ padding: 0.05, maxZoom: 0.98 }}
             minZoom={0.35}

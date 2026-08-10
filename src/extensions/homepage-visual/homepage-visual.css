@@ -803,6 +803,15 @@
   stroke-linecap: round;
 }
 
+.homepage-architecture .hp-trace-pulse-layer {
+  pointer-events: none;
+}
+
+.homepage-architecture .hp-trace-pulse-dot {
+  filter: drop-shadow(0 0 5px currentColor);
+  opacity: 0.95;
+}
+
 .homepage-architecture .hp-network-list-btn {
   display: grid;
   grid-template-columns: 8px 1fr auto auto;
