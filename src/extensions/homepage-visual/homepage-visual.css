@@ -781,14 +781,26 @@
   gap: 6px;
 }
 
+.homepage-architecture .hp-presentation-panel {
+  margin: 8px;
+}
+
 .homepage-architecture .hp-presentation-bar {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 24;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+.homepage-architecture .hp-fit-btn-inline {
+  position: static;
+}
+
+.homepage-architecture .homepage-architecture-flow.hp-trace-active .react-flow__edge.hp-trace-edge .react-flow__edge-path {
+  filter: drop-shadow(0 0 4px color-mix(in srgb, currentColor 55%, transparent));
+}
+
+.homepage-architecture .homepage-architecture-flow.hp-trace-active .react-flow__edge.hp-trace-edge path {
+  stroke-linecap: round;
 }
 
 .homepage-architecture .hp-network-list-btn {

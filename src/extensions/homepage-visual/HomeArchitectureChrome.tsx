@@ -12,17 +12,21 @@ function FitViewIcon() {
 }
 
 /** Homepage-only chrome: fit-to-screen control and orientation hint. */
-export function HomeFitViewButton() {
+export function HomeFitViewButton({ inline = false }: { inline?: boolean }) {
   const { fitView } = useReactFlow();
 
   const onFit = useCallback(() => {
     fitView({ padding: 0.05, maxZoom: 0.98, duration: 320 });
   }, [fitView]);
 
+  const className = inline
+    ? 'hp-fit-btn hp-fit-btn-inline'
+    : 'hp-fit-btn absolute bottom-3 left-3 z-10';
+
   return (
     <button
       type="button"
-      className="hp-fit-btn absolute bottom-3 left-3 z-10"
+      className={className}
       onClick={onFit}
       title="Fit architecture to screen"
     >

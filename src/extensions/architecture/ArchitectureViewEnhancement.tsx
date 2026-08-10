@@ -6,6 +6,7 @@ import {
   Background,
   Controls,
   MiniMap,
+  Panel,
   ViewportPortal,
   useNodesState,
   useEdgesState,
@@ -32,6 +33,7 @@ import { HomepageGuidedTour } from '@/extensions/homepage-visual/HomepageGuidedT
 import { HomepageFocusController } from '@/extensions/homepage-visual/HomepageFocusController';
 import { HomepagePresentationBar } from '@/extensions/homepage-visual/HomepagePresentationBar';
 import '@/extensions/homepage-visual/homepage-visual.css';
+import { getTraceEdgeIds } from '@/extensions/homepage-visual/homepageGraphUtils';
 import { getHomepageLayoutPosition as getVehicleLayoutPosition } from '@/extensions/homepage-visual/homepageZoneLayout';
 import { getVehicleZone } from './vehicleZoneLayout';
 import { buildPartnerEdges, getConnectedEcuIds } from './buildPartnerEdges';
@@ -39,6 +41,7 @@ import { buildPartnerEdges, getConnectedEcuIds } from './buildPartnerEdges';
 const nodeTypes = { ecuNode: HomeECUNode };
 const EMPTY_CONNECTED_IDS: string[] = [];
 const EMPTY_RELEVANT_IDS: string[] = [];
+const EMPTY_TRACE_EDGE_IDS: string[] = [];
 
 export function ArchitectureViewEnhancement() {
   return (
@@ -74,6 +77,7 @@ function ArchitectureViewEnhancementInner() {
     setClickFocus,
     handleTraceNodeClick,
     guidedTourOpen,
+    tracePathIds,
   } = useHomepageInteraction();
 
   const feature = selectedFeatureId ? getFeatureById(selectedFeatureId) : null;
@@ -142,6 +146,15 @@ function ArchitectureViewEnhancementInner() {
   const initialNodes = useMemo(() => buildNodes(), [buildNodes]);
   const initialEdges = useMemo(() => buildPartnerEdges(ecus), []);
 
+  const tracePathKey = tracePathIds.join('|');
+  const traceEdgeIds = useMemo(() => {
+    if (tracePathIds.length < 2) return EMPTY_TRACE_EDGE_IDS;
+    return getTraceEdgeIds(tracePathIds, initialEdges);
+  }, [tracePathKey, initialEdges]);
+  const traceEdgeIdKey = traceEdgeIds.join('|');
+  const traceEdgeIdSet = useMemo(() => new Set(traceEdgeIds), [traceEdgeIdKey]);
+  const isTracePathActive = tracePathIds.length >= 2 && traceEdgeIds.length > 0;
+
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
@@ -191,6 +204,7 @@ function ArchitectureViewEnhancementInner() {
       const relevantSet = new Set(relevantIdList);
       setEdges(
         buildPartnerEdges(ecus).map((e) => {
+          const isTraceEdge = isTracePathActive && traceEdgeIdSet.has(e.id);
           const inHover =
             hoverSet &&
             hoverSet.has(e.source) &&
@@ -199,14 +213,20 @@ function ArchitectureViewEnhancementInner() {
             relevantSet.has(e.source) && relevantSet.has(e.target);
 
           let opacity = 0.35;
-          if (hoverSet && !hasFocus) opacity = inHover ? 0.55 : 0.1;
+          if (isTracePathActive) opacity = isTraceEdge ? 0.92 : 0.08;
+          else if (hoverSet && !hasFocus) opacity = inHover ? 0.55 : 0.1;
           else if (hasFocus) opacity = inRelevant ? 0.55 : 0.08;
+
+          const baseStrokeWidth =
+            viewMode === 'network' ? 1.6 : (e.style?.strokeWidth as number) ?? 1.2;
 
           return {
             ...e,
+            animated: isTraceEdge,
+            className: isTraceEdge ? 'hp-trace-edge' : undefined,
             style: {
               ...e.style,
-              strokeWidth: viewMode === 'network' ? 1.6 : (e.style?.strokeWidth as number) ?? 1.2,
+              strokeWidth: isTraceEdge ? 2.4 : baseStrokeWidth,
               opacity,
             },
           };
@@ -223,6 +243,9 @@ function ArchitectureViewEnhancementInner() {
     relevantIdKey,
     hoveredEcuId,
     viewMode,
+    isTracePathActive,
+    traceEdgeIdKey,
+    traceEdgeIdSet,
   ]);
 
   const onNodeClick = useCallback(
@@ -272,6 +295,7 @@ function ArchitectureViewEnhancementInner() {
     isSimulationRunning ? 'hp-simulation-active' : '',
     viewMode === 'network' ? 'hp-view-network' : '',
     guidedTourOpen ? 'hp-guided-tour-active' : '',
+    isTracePathActive ? 'hp-trace-active' : '',
   ].filter(Boolean).join(' ');
 
   return (
@@ -286,7 +310,6 @@ function ArchitectureViewEnhancementInner() {
           <HomepageTracePanel />
           <HomepageClearFocus />
           <HomepageGuidedTour />
-          <HomepagePresentationBar />
           {presentationMode && (
             <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 px-4 py-1.5 rounded-full bg-slate-900/80 border border-cyan-500/20 text-[10px] text-cyan-300/80 font-mono">
               Illustrative Vehicle E/E Topology
@@ -312,6 +335,11 @@ function ArchitectureViewEnhancementInner() {
             className={flowClassName}
           >
             <HomepageFocusController />
+            {presentationMode && (
+              <Panel position="top-left" className="hp-presentation-panel">
+                <HomepagePresentationBar />
+              </Panel>
+            )}
             <ViewportPortal>
               <div className="hp-vehicle-layer">
                 <HomeVehicleSilhouette />

@@ -36,7 +36,7 @@ export function HomepagePresentationBar() {
 
   return (
     <div className="hp-presentation-bar" aria-label="Presentation controls">
-      <HomeFitViewButton />
+      <HomeFitViewButton inline />
       <button type="button" className="hp-toolbar-btn" onClick={() => traceActive ? exitTrace() : startTrace()}>
         {traceActive ? 'EXIT TRACE' : 'TRACE'}
       </button>

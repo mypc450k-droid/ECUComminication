@@ -1,3 +1,4 @@
+import type { Edge } from '@xyflow/react';
 import type { ECU } from '@/types';
 import { ecus, features, networks } from '@/lib/data';
 import type { AsilLevel } from '@/types';
@@ -40,6 +41,27 @@ export function findCommunicationPath(sourceId: string, destId: string): string[
   }
 
   return [];
+}
+
+/** Map consecutive ECU pairs on a BFS path to existing partner-edge IDs (no new edges). */
+export function getTraceEdgeIds(pathEcuIds: string[], edges: Edge[]): string[] {
+  if (pathEcuIds.length < 2) return [];
+
+  const edgeByPair = new Map<string, string>();
+  for (const edge of edges) {
+    const pairKey = [edge.source, edge.target].sort().join('|');
+    if (!edgeByPair.has(pairKey)) {
+      edgeByPair.set(pairKey, edge.id);
+    }
+  }
+
+  const traceIds: string[] = [];
+  for (let i = 0; i < pathEcuIds.length - 1; i += 1) {
+    const pairKey = [pathEcuIds[i], pathEcuIds[i + 1]].sort().join('|');
+    const edgeId = edgeByPair.get(pairKey);
+    if (edgeId) traceIds.push(edgeId);
+  }
+  return traceIds;
 }
 
 export function buildPathSummary(pathIds: string[]): string[] {
