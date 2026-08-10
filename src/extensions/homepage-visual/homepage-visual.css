@@ -9,130 +9,174 @@
 .homepage-architecture.engineering-bg {
   background-color: #070b12;
   background-image:
-    linear-gradient(rgba(0, 212, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 212, 255, 0.02) 1px, transparent 1px),
-    radial-gradient(ellipse 85% 60% at 50% 44%, rgba(0, 212, 255, 0.05) 0%, transparent 72%);
-  background-size: 48px 48px, 48px 48px, 100% 100%;
+    linear-gradient(rgba(0, 212, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.018) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
-/* Vehicle silhouette — beneath React Flow */
-.homepage-architecture .hp-vehicle-silhouette {
+/* Vehicle layer — inside React Flow viewport (flow coordinates) */
+.homepage-architecture .hp-vehicle-layer {
   position: absolute;
-  inset: 0;
-  z-index: 0;
+  left: 0;
+  top: 0;
+  width: 1000px;
+  height: 780px;
   pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2% 4%;
+  z-index: 0;
 }
 
 .homepage-architecture .hp-vehicle-svg {
-  width: 100%;
-  height: 100%;
-  max-width: 1180px;
-  max-height: 100%;
+  display: block;
 }
 
 .homepage-architecture .hp-vehicle-body {
+  stroke: none;
+}
+
+.homepage-architecture .hp-vehicle-outline {
+  fill: none;
+  stroke: rgba(56, 189, 248, 0.32);
   stroke-width: 1.5;
 }
 
-.homepage-architecture .hp-vehicle-cockpit {
-  fill: rgba(56, 189, 248, 0.04);
+.homepage-architecture .hp-vehicle-region {
+  stroke-width: 1;
+  fill: rgba(56, 189, 248, 0.03);
+  stroke: rgba(56, 189, 248, 0.1);
+}
+
+.homepage-architecture .hp-vehicle-windshield,
+.homepage-architecture .hp-vehicle-rear-glass {
+  stroke-dasharray: 3 5;
+  fill: rgba(56, 189, 248, 0.05);
+}
+
+.homepage-architecture .hp-wheel-arch {
+  fill: rgba(7, 11, 18, 0.75);
+  stroke: rgba(100, 116, 139, 0.28);
+  stroke-width: 1.2;
+}
+
+.homepage-architecture .hp-wheel-tire {
+  fill: rgba(30, 41, 59, 0.85);
+  stroke: rgba(71, 85, 105, 0.45);
+  stroke-width: 1;
+}
+
+.homepage-architecture .hp-centerline {
   stroke: rgba(56, 189, 248, 0.12);
   stroke-width: 1;
-  stroke-dasharray: 4 6;
+  stroke-dasharray: 3 8;
 }
 
-.homepage-architecture .hp-wheel-well {
-  fill: rgba(7, 11, 18, 0.65);
-  stroke: rgba(100, 116, 139, 0.22);
-  stroke-width: 1;
+.homepage-architecture .hp-zone-band {
+  fill: rgba(56, 189, 248, 0.02);
 }
 
-.homepage-architecture .hp-zone-divider {
-  stroke: rgba(56, 189, 248, 0.08);
-  stroke-width: 1;
-  stroke-dasharray: 4 8;
+.homepage-architecture .hp-zone-band-perception {
+  fill: rgba(56, 189, 248, 0.035);
+}
+
+.homepage-architecture .hp-zone-band-cabin {
+  fill: rgba(167, 139, 250, 0.025);
+}
+
+.homepage-architecture .hp-zone-band-powertrain {
+  fill: rgba(251, 191, 36, 0.025);
+}
+
+.homepage-architecture .hp-zone-band-chassis {
+  fill: rgba(52, 211, 153, 0.025);
 }
 
 .homepage-architecture .hp-zone-label {
-  fill: rgba(148, 163, 184, 0.42);
+  fill: rgba(148, 163, 184, 0.38);
   font-family: ui-monospace, monospace;
-  font-size: 9px;
-  letter-spacing: 0.1em;
+  font-size: 8px;
+  letter-spacing: 0.12em;
   font-weight: 600;
 }
 
 .homepage-architecture .hp-orient-label {
-  fill: rgba(148, 163, 184, 0.5);
+  fill: rgba(148, 163, 184, 0.45);
   font-family: ui-monospace, monospace;
-  font-size: 10px;
+  font-size: 9px;
   letter-spacing: 0.14em;
   text-anchor: middle;
   font-weight: 600;
 }
 
 .homepage-architecture .hp-orient-front {
-  fill: rgba(56, 189, 248, 0.55);
+  fill: rgba(56, 189, 248, 0.6);
 }
 
 .homepage-architecture .hp-orient-arrow-front {
-  fill: rgba(56, 189, 248, 0.4);
+  fill: rgba(56, 189, 248, 0.45);
 }
 
 .homepage-architecture .hp-orient-arrow-rear {
   fill: rgba(100, 116, 139, 0.35);
 }
 
+.homepage-architecture .hp-side-label {
+  fill: rgba(100, 116, 139, 0.35);
+  font-family: ui-monospace, monospace;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+.homepage-architecture .hp-side-right {
+  text-anchor: end;
+}
+
 .homepage-architecture .hp-vignette {
   pointer-events: none;
   position: absolute;
   inset: 0;
-  z-index: 1;
-  background: radial-gradient(ellipse 80% 70% at 50% 48%, transparent 42%, rgba(0, 0, 0, 0.28) 100%);
+  z-index: 3;
+  background: radial-gradient(ellipse 82% 72% at 50% 48%, transparent 48%, rgba(0, 0, 0, 0.22) 100%);
 }
 
-/* React Flow layering — edges behind ECU cards */
+/* React Flow layering — vehicle → edges → ECU nodes */
 .homepage-architecture .homepage-architecture-flow {
   z-index: 2;
 }
 
 .homepage-architecture .homepage-architecture-flow .react-flow__edges {
-  z-index: 0;
+  z-index: 1;
 }
 
 .homepage-architecture .homepage-architecture-flow .react-flow__nodes {
   z-index: 2;
 }
 
-/* Glass ECU cards — homepage only (outer node shell only) */
+/* Compact engineering ECU modules — homepage only */
 .homepage-architecture .react-flow__node > div {
-  border-radius: 10px !important;
-  min-width: 112px !important;
-  max-width: 130px !important;
+  border-radius: 8px !important;
+  min-width: 96px !important;
+  max-width: 104px !important;
   box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+    0 3px 12px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-/* Subtle idle edge pulse — CSS only, no React state loops */
+/* Network edges — behind cards, subtle */
 .homepage-architecture .homepage-architecture-flow .react-flow__edge-path {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .homepage-architecture .homepage-architecture-flow:not(.hp-simulation-active) .react-flow__edge:not(.react-flow__edge-animated) .react-flow__edge-path {
-  stroke-dasharray: 5 12;
-  animation: hp-edge-idle 4s linear infinite;
+  stroke-dasharray: 4 10;
+  animation: hp-edge-idle 5s linear infinite;
 }
 
 @keyframes hp-edge-idle {
   to {
-    stroke-dashoffset: -34;
+    stroke-dashoffset: -28;
   }
 }
 
@@ -191,7 +235,7 @@
   color: rgba(71, 85, 105, 0.95);
 }
 
-/* Controls & minimap polish */
+/* Controls & minimap */
 .homepage-architecture .hp-flow-controls.react-flow__controls {
   background: rgba(10, 16, 28, 0.92) !important;
   border: 1px solid var(--hp-border) !important;
@@ -207,8 +251,8 @@
 }
 
 .homepage-architecture .hp-flow-minimap {
-  width: 200px !important;
-  height: 148px !important;
+  width: 188px !important;
+  height: 140px !important;
   border-radius: 10px !important;
   border: 1px solid var(--hp-border) !important;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);

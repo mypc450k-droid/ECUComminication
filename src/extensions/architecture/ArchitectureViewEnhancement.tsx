@@ -6,6 +6,7 @@ import {
   Background,
   Controls,
   MiniMap,
+  ViewportPortal,
   useNodesState,
   useEdgesState,
   type Node,
@@ -161,7 +162,6 @@ export function ArchitectureViewEnhancement() {
 
   return (
     <div className="relative w-full h-full engineering-bg homepage-architecture">
-      <HomeVehicleSilhouette />
       <div className="hp-vignette" aria-hidden />
       {presentationMode && (
         <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 px-4 py-1.5 rounded-full bg-slate-900/80 border border-cyan-500/20 text-[10px] text-cyan-300/80 font-mono">
@@ -177,13 +177,18 @@ export function ArchitectureViewEnhancement() {
         onNodeDoubleClick={onNodeDoubleClick}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: 0.08, maxZoom: 1.12 }}
+        fitViewOptions={{ padding: 0.06, maxZoom: 1.05 }}
         minZoom={0.35}
         maxZoom={2}
         proOptions={{ hideAttribution: true }}
         className={`bg-transparent homepage-architecture-flow${isSimulationRunning ? ' hp-simulation-active' : ''}`}
       >
-        <Background color="rgba(0,212,255,0.025)" gap={48} size={1} />
+        <ViewportPortal>
+          <div className="hp-vehicle-layer">
+            <HomeVehicleSilhouette />
+          </div>
+        </ViewportPortal>
+        <Background color="rgba(0,212,255,0.02)" gap={48} size={1} />
         {!presentationMode && (
           <>
             <HomeDirectionPill />
