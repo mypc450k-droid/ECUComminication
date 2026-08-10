@@ -10,22 +10,25 @@ import {
   useNodesState,
   useEdgesState,
   type Node,
-  type Edge,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useAppStore } from '@/lib/store';
 import { ecus, getFeatureById } from '@/lib/data';
-import { ECUNode, type ECUNodeData } from '@/components/ECUNode';
+import { type ECUNodeData } from '@/components/ECUNode';
+import { HomeECUNode } from '@/extensions/homepage-visual/HomeECUNode';
 import { useExtensionStore } from '../store/extensionStore';
 import { HomeVehicleSilhouette } from '@/extensions/homepage-visual/HomeVehicleSilhouette';
+import { HomeDomainLabels } from '@/extensions/homepage-visual/HomeDomainLabels';
 import { HomeFitViewButton, HomeDirectionPill } from '@/extensions/homepage-visual/HomeArchitectureChrome';
-import { HomeNetworkLegend } from '@/extensions/homepage-visual/HomeNetworkLegend';
+import { HomeLeftPanel } from '@/extensions/homepage-visual/HomeLeftPanel';
+import { HomeArchitecturePanel } from '@/extensions/homepage-visual/HomeArchitecturePanel';
+import { HomeArchitectureTitle } from '@/extensions/homepage-visual/HomeArchitectureTitle';
 import '@/extensions/homepage-visual/homepage-visual.css';
 import { getHomepageLayoutPosition as getVehicleLayoutPosition } from '@/extensions/homepage-visual/homepageZoneLayout';
 import { getVehicleZone } from './vehicleZoneLayout';
 import { buildPartnerEdges, getConnectedEcuIds } from './buildPartnerEdges';
 
-const nodeTypes = { ecuNode: ECUNode };
+const nodeTypes = { ecuNode: HomeECUNode };
 const EMPTY_CONNECTED_IDS: string[] = [];
 
 export function ArchitectureViewEnhancement() {
@@ -161,14 +164,19 @@ export function ArchitectureViewEnhancement() {
   );
 
   return (
-    <div className="relative w-full h-full engineering-bg homepage-architecture">
-      <div className="hp-vignette" aria-hidden />
-      {presentationMode && (
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 px-4 py-1.5 rounded-full bg-slate-900/80 border border-cyan-500/20 text-[10px] text-cyan-300/80 font-mono">
-          Illustrative Vehicle E/E Topology
-        </div>
-      )}
-      <ReactFlow
+    <div className="relative w-full h-full engineering-bg homepage-architecture hp-layout-root">
+      <HomeArchitectureTitle />
+      <div className="hp-layout-body">
+        <HomeLeftPanel />
+        <div className="hp-canvas-wrap">
+          <div className="hp-vignette" aria-hidden />
+          {presentationMode && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 px-4 py-1.5 rounded-full bg-slate-900/80 border border-cyan-500/20 text-[10px] text-cyan-300/80 font-mono">
+              Illustrative Vehicle E/E Topology
+            </div>
+          )}
+          <HomeArchitecturePanel />
+          <ReactFlow
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
@@ -177,7 +185,7 @@ export function ArchitectureViewEnhancement() {
         onNodeDoubleClick={onNodeDoubleClick}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: 0.06, maxZoom: 1.05 }}
+        fitViewOptions={{ padding: 0.05, maxZoom: 0.98 }}
         minZoom={0.35}
         maxZoom={2}
         proOptions={{ hideAttribution: true }}
@@ -186,6 +194,9 @@ export function ArchitectureViewEnhancement() {
         <ViewportPortal>
           <div className="hp-vehicle-layer">
             <HomeVehicleSilhouette />
+          </div>
+          <div className="hp-domain-labels-layer">
+            <HomeDomainLabels />
           </div>
         </ViewportPortal>
         <Background color="rgba(0,212,255,0.02)" gap={48} size={1} />
@@ -201,6 +212,7 @@ export function ArchitectureViewEnhancement() {
             <MiniMap
               position="bottom-right"
               className="hp-flow-minimap !bg-slate-950/90 !border-cyan-500/15 !bottom-3 !right-3"
+              nodeStrokeWidth={2}
               nodeColor={(node) => {
                 const zone = getVehicleZone(node.id);
                 if (zone === 'front') return '#38bdf8';
@@ -216,7 +228,8 @@ export function ArchitectureViewEnhancement() {
           </>
         )}
       </ReactFlow>
-      <HomeNetworkLegend />
+        </div>
+      </div>
     </div>
   );
 }

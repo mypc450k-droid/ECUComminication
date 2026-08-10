@@ -1,23 +1,22 @@
 /**
- * Shared vehicle coordinate system for homepage presentation.
- * ECU layout positions and SVG silhouette use the same flow-space bounds.
+ * Shared vehicle coordinate system for homepage presentation (flow-space pixels).
  */
-export const HOMEPAGE_LAYOUT_BOUNDS = { width: 1000, height: 780 };
+export const HOMEPAGE_LAYOUT_BOUNDS = { width: 1320, height: 880 };
 
 export const VEHICLE_CENTER_X = HOMEPAGE_LAYOUT_BOUNDS.width / 2;
 
-/** Longitudinal zone bands (flow-space Y) — used for subtle zone visualization. */
-export const VEHICLE_ZONE_BANDS = [
-  { id: 'perception', label: 'PERCEPTION', yStart: 0.08, yEnd: 0.22 },
-  { id: 'cabin', label: 'CABIN', yStart: 0.22, yEnd: 0.52 },
-  { id: 'powertrain', label: 'POWERTRAIN', yStart: 0.52, yEnd: 0.68 },
-  { id: 'chassis', label: 'CHASSIS', yStart: 0.68, yEnd: 0.82 },
-] as const;
-
-/** Wheel hub centers — door ECUs anchor near corresponding corners. */
+/** Wheel hubs — door ECUs anchor near corresponding corners. */
 export const VEHICLE_WHEELS = {
-  fl: { x: 195, y: 265 },
-  fr: { x: 805, y: 265 },
-  rl: { x: 195, y: 555 },
-  rr: { x: 805, y: 555 },
+  fl: { x: 200, y: 310 },
+  fr: { x: 1120, y: 310 },
+  rl: { x: 200, y: 610 },
+  rr: { x: 1120, y: 610 },
 } as const;
+
+/** Presentation domain bands for subtle in-body tinting. */
+export const VEHICLE_DOMAIN_BANDS = [
+  { id: 'adas', yStart: 0.1, yEnd: 0.24 },
+  { id: 'cabin', yStart: 0.24, yEnd: 0.52 },
+  { id: 'powertrain', yStart: 0.52, yEnd: 0.68 },
+  { id: 'chassis', yStart: 0.68, yEnd: 0.86 },
+] as const;

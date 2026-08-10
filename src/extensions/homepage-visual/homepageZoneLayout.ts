@@ -1,57 +1,71 @@
 import type { ECU } from '@/types';
 import { getVehicleLayoutPosition } from '@/extensions/architecture/vehicleZoneLayout';
-import { HOMEPAGE_LAYOUT_BOUNDS, VEHICLE_CENTER_X, VEHICLE_WHEELS } from './homepageVehicleGeometry';
+import { HOMEPAGE_LAYOUT_BOUNDS, VEHICLE_WHEELS } from './homepageVehicleGeometry';
 
 /**
- * Vehicle-native ECU positions — each ECU anchored to a physical vehicle region.
- * Coordinates are React Flow space (top-left of node), aligned with HomeVehicleSilhouette.
+ * HOME_VISUAL_LAYOUT — presentation-only ECU positions grouped by functional domain.
+ * Aligns with reference engineering diagram composition; does not alter graph topology.
  */
 export { HOMEPAGE_LAYOUT_BOUNDS };
 
-const cx = VEHICLE_CENTER_X;
-const { fl, fr, rl, rr } = VEHICLE_WHEELS;
+const CARD_GAP = 142;
+const ADAS_Y = 88;
+const BODY_TOP_Y = 88;
+const BODY_SECOND_Y = 188;
+const CABIN_Y = 430;
+const GATEWAY_Y = 288;
+const POWERTRAIN_Y = 578;
+const CHASSIS_Y = 718;
 
-const HOMEPAGE_ZONE_POSITIONS: Record<string, { x: number; y: number }> = {
-  // ── FRONT / PERCEPTION — hood & front bumper region ──
-  camera: { x: cx - 52, y: 62 },
-  radar: { x: cx - 128, y: 82 },
-  adas: { x: cx - 52, y: 102 },
-  ultrasonic: { x: cx + 76, y: 82 },
-  lighting: { x: cx - 52, y: 148 },
+const ADAS_X_START = 218;
+const BODY_X_START = 818;
+const POWERTRAIN_X_START = 158;
+const CHASSIS_X_START = 398;
 
-  // ── DOOR ECUs — vehicle corners (not clustered) ──
-  'door-fl': { x: fl.x - 118, y: fl.y - 58 },
-  'door-fr': { x: fr.x + 18, y: fr.y - 58 },
-  'door-rl': { x: rl.x - 118, y: rl.y - 42 },
-  'door-rr': { x: rr.x + 18, y: rr.y - 42 },
-  'pw-fl': { x: fl.x - 82, y: fl.y - 8 },
+const HOME_VISUAL_LAYOUT: Record<string, { x: number; y: number }> = {
+  // DOMAIN 1 — ADAS & SENSORS (front row, evenly spaced)
+  camera: { x: ADAS_X_START, y: ADAS_Y },
+  radar: { x: ADAS_X_START + CARD_GAP, y: ADAS_Y },
+  adas: { x: ADAS_X_START + CARD_GAP * 2, y: ADAS_Y },
+  ultrasonic: { x: ADAS_X_START + CARD_GAP * 3, y: ADAS_Y },
 
-  // ── CABIN — distributed inside body, longitudinal spread ──
-  sunroof: { x: cx - 48, y: 188 },
-  telematics: { x: cx + 172, y: 212 },
-  cluster: { x: cx - 92, y: 238 },
-  infotainment: { x: cx + 28, y: 238 },
-  bcm: { x: cx - 168, y: 288 },
-  gateway: { x: cx - 48, y: 280 },
-  airbag: { x: cx - 248, y: 308 },
-  hvac: { x: cx + 128, y: 295 },
-  seat: { x: cx - 108, y: 348 },
+  // DOMAIN 2 — BODY & COMFORT (top-right cluster + doors at corners)
+  lighting: { x: BODY_X_START, y: BODY_TOP_Y },
+  bcm: { x: BODY_X_START + CARD_GAP, y: BODY_TOP_Y },
+  hvac: { x: BODY_X_START + CARD_GAP * 2, y: BODY_TOP_Y },
+  sunroof: { x: BODY_X_START, y: BODY_SECOND_Y },
+  seat: { x: BODY_X_START + CARD_GAP * 2, y: CABIN_Y },
 
-  // ── POWERTRAIN — central tunnel / axle region ──
-  charging: { x: cx - 278, y: 468 },
-  bms: { x: cx - 198, y: 418 },
-  engine: { x: cx - 78, y: 408 },
-  transmission: { x: cx + 18, y: 408 },
-  'motor-controller': { x: cx + 118, y: 408 },
-  inverter: { x: cx + 218, y: 418 },
+  'door-fl': { x: 24, y: VEHICLE_WHEELS.fl.y - 52 },
+  'door-fr': { x: 1178, y: VEHICLE_WHEELS.fr.y - 52 },
+  'door-rl': { x: 24, y: VEHICLE_WHEELS.rl.y - 52 },
+  'door-rr': { x: 1178, y: VEHICLE_WHEELS.rr.y - 52 },
+  'pw-fl': { x: 24, y: VEHICLE_WHEELS.fl.y + 18 },
 
-  // ── CHASSIS — lower vehicle band ──
-  abs: { x: cx - 108, y: 538 },
-  esp: { x: cx - 8, y: 548 },
-  steering: { x: cx + 92, y: 538 },
-  epb: { x: cx + 192, y: 548 },
+  // DOMAIN 3 — CENTRAL COMMUNICATION (gateway hub)
+  gateway: { x: 598, y: GATEWAY_Y },
+
+  // Cabin / display controllers (central band)
+  cluster: { x: 378, y: CABIN_Y },
+  infotainment: { x: 518, y: CABIN_Y },
+  telematics: { x: 758, y: CABIN_Y },
+  airbag: { x: 1038, y: CABIN_Y },
+
+  // DOMAIN 4 — POWERTRAIN (lower-central horizontal group)
+  charging: { x: POWERTRAIN_X_START, y: POWERTRAIN_Y },
+  bms: { x: POWERTRAIN_X_START + CARD_GAP, y: POWERTRAIN_Y },
+  engine: { x: POWERTRAIN_X_START + CARD_GAP * 2, y: POWERTRAIN_Y },
+  transmission: { x: POWERTRAIN_X_START + CARD_GAP * 3, y: POWERTRAIN_Y },
+  'motor-controller': { x: POWERTRAIN_X_START + CARD_GAP * 4, y: POWERTRAIN_Y },
+  inverter: { x: POWERTRAIN_X_START + CARD_GAP * 5, y: POWERTRAIN_Y },
+
+  // DOMAIN 5 — CHASSIS & SAFETY (lower band)
+  abs: { x: CHASSIS_X_START, y: CHASSIS_Y },
+  esp: { x: CHASSIS_X_START + CARD_GAP, y: CHASSIS_Y },
+  steering: { x: CHASSIS_X_START + CARD_GAP * 2, y: CHASSIS_Y },
+  epb: { x: CHASSIS_X_START + CARD_GAP * 3, y: CHASSIS_Y },
 };
 
 export function getHomepageLayoutPosition(ecu: ECU): { x: number; y: number } {
-  return HOMEPAGE_ZONE_POSITIONS[ecu.id] ?? getVehicleLayoutPosition(ecu);
+  return HOME_VISUAL_LAYOUT[ecu.id] ?? getVehicleLayoutPosition(ecu);
 }
