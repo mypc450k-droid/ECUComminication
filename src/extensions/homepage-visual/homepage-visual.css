@@ -371,9 +371,16 @@
   stroke-linejoin: miter;
 }
 
-.homepage-architecture .homepage-architecture-flow:not(.hp-simulation-active) .react-flow__edge:not(.react-flow__edge-animated) .react-flow__edge-path {
-  stroke-dasharray: none;
-  animation: none;
+/* Subtle idle edge pulse — CSS only, no React state loops */
+.homepage-architecture .homepage-architecture-flow:not(.hp-simulation-active) .react-flow__edge:not(.react-flow__edge-animated):not(.hp-trace-edge) .react-flow__edge-path {
+  stroke-dasharray: 6 10;
+  animation: hp-edge-idle 3.5s linear infinite;
+}
+
+@keyframes hp-edge-idle {
+  to {
+    stroke-dashoffset: -32;
+  }
 }
 
 /* ── ECU engineering modules ── */
