@@ -5,7 +5,7 @@ import { getVehicleZone, getZoneLabel } from '@/extensions/architecture/vehicleZ
 
 const NOT_AVAILABLE = 'Not available in current architecture data.';
 
-const ASIL_MEANINGS: Record<AsilLevel, string> = {
+export const ASIL_MEANINGS: Record<AsilLevel, string> = {
   QM: 'QM means no automotive safety integrity requirement is assigned to this item in the current data.',
   A: 'ASIL A is the lowest safety level — indicates limited injury risk if the function fails.',
   B: 'ASIL B indicates moderate injury risk; the ECU participates in safety-related body or chassis functions.',
@@ -195,7 +195,7 @@ export function buildFeatureArchitectureExplanation(feature: Feature): Architect
     },
     {
       title: 'Purpose',
-      lines: [feature.description || NOT_AVAILABLE],
+      lines: [feature.physicalOutput || NOT_AVAILABLE],
     },
     {
       title: 'Driver / system input',

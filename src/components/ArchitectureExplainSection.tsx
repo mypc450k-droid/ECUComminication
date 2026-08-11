@@ -1,23 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { ArchitectureExplanation } from '@/extensions/inspector/architectureExplain';
 import { cn } from '@/lib/utils';
 
 interface ArchitectureExplainSectionProps {
-  selectionKey: string;
   explanation: ArchitectureExplanation;
 }
 
 export function ArchitectureExplainSection({
-  selectionKey,
   explanation,
 }: ArchitectureExplainSectionProps) {
   const [expanded, setExpanded] = useState(false);
-
-  useEffect(() => {
-    setExpanded(false);
-  }, [selectionKey]);
 
   return (
     <div className="border-t border-cyan-500/10 pt-3">
