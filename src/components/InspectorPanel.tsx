@@ -7,7 +7,57 @@ import { EcuInspectorActions } from '@/extensions/panels/EcuInspectorActions';
 import { getVehicleZone, getZoneLabel } from '@/extensions/architecture/vehicleZoneLayout';
 import { GlassPanel } from './ui/GlassPanel';
 import { AsilBadge, NetworkBadge } from './ui/Badges';
+import { ArchitectureExplainSection } from './ArchitectureExplainSection';
+import {
+  ASIL_MEANINGS,
+  buildEcuArchitectureExplanation,
+  buildFeatureArchitectureExplanation,
+} from '@/extensions/inspector/architectureExplain';
+import type { AsilLevel, Feature, VehicleDomain } from '@/types';
 import { cn } from '@/lib/utils';
+
+const NOT_SPECIFIED = 'Not specified';
+
+const DOMAIN_LABELS: Record<VehicleDomain, string> = {
+  body: 'Body / Cabin',
+  powertrain: 'Powertrain',
+  chassis: 'Chassis',
+  adas: 'ADAS',
+  comfort: 'Comfort',
+  infotainment: 'Infotainment',
+  safety: 'Safety',
+  diagnostics: 'Diagnostics',
+  autosar: 'AUTOSAR',
+  iso26262: 'ISO 26262',
+};
+
+function displayValue(value: string | undefined | null): string {
+  return value?.trim() ? value : NOT_SPECIFIED;
+}
+
+function getFeaturePurpose(feature: Feature): string {
+  const outputStage = feature.flowStages.find((stage) => stage.type === 'output');
+  if (outputStage?.description?.trim()) return outputStage.description;
+  if (feature.physicalOutput?.trim()) return feature.physicalOutput;
+  return NOT_SPECIFIED;
+}
+
+function getFeatureAsilLevels(feature: Feature): AsilLevel[] {
+  const levels = new Set<AsilLevel>();
+  feature.involvedEcus.forEach((id) => {
+    const ecu = getEcuById(id);
+    if (ecu) levels.add(ecu.asil);
+  });
+  return Array.from(levels);
+}
+
+function InspectorKindBadge({ kind }: { kind: 'inspector' | 'feature' }) {
+  return (
+    <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded border border-cyan-500/25 bg-cyan-500/10 text-cyan-300/90">
+      {kind === 'inspector' ? 'Inspector' : 'Feature'}
+    </span>
+  );
+}
 
 export function InspectorPanel() {
   const selectedEcuId = useAppStore((s) => s.selectedEcuId);
@@ -15,6 +65,7 @@ export function InspectorPanel() {
   const selectedAutosarLayerId = useAppStore((s) => s.selectedAutosarLayerId);
   const viewMode = useAppStore((s) => s.viewMode);
   const ecu = selectedEcuId ? getEcuById(selectedEcuId) : null;
+  const ecuExplanation = ecu ? buildEcuArchitectureExplanation(ecu) : null;
 
   if (viewMode === 'autosar' && selectedAutosarLayerId) {
     return <AutosarInspector layerId={selectedAutosarLayerId} />;
@@ -26,7 +77,7 @@ export function InspectorPanel() {
 
   if (!ecu) {
     return (
-      <aside className="w-72 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
+      <aside className="w-full h-full min-h-0 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
         <div className="p-3 border-b border-cyan-500/10">
           <h2 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
             Inspector
@@ -49,12 +100,10 @@ export function InspectorPanel() {
   }
 
   return (
-    <aside className="w-72 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
+    <aside className="w-full h-full min-h-0 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
       <div className="p-3 border-b border-cyan-500/10">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-            Inspector
-          </h2>
+        <div className="flex items-center justify-between gap-2">
+          <InspectorKindBadge kind="inspector" />
           <AsilBadge level={ecu.asil} />
         </div>
         <h3 className="text-sm font-semibold text-slate-100 mt-1">{ecu.name}</h3>
@@ -64,22 +113,22 @@ export function InspectorPanel() {
         </p>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-3">
         <InspectorSection title="Description">
           <p className="text-xs text-slate-400 leading-relaxed">{ecu.description}</p>
         </InspectorSection>
 
         <InspectorSection title="Purpose">
-          <p className="text-xs text-slate-400 leading-relaxed">{ecu.purpose}</p>
+          <p className="text-xs text-slate-400 leading-relaxed">{displayValue(ecu.purpose)}</p>
         </InspectorSection>
 
         <InspectorSection title="Hardware">
           <div className="space-y-1.5">
-            <InfoRow label="MCU" value={ecu.microcontroller} />
-            <InfoRow label="Flash" value={ecu.flash} />
-            <InfoRow label="RAM" value={ecu.ram} />
-            <InfoRow label="Supplier" value={ecu.supplier} />
-            <InfoRow label="Power Mode" value={ecu.powerMode} />
+            <InfoRow label="MCU" value={displayValue(ecu.microcontroller)} />
+            <InfoRow label="Flash" value={displayValue(ecu.flash)} />
+            <InfoRow label="RAM" value={displayValue(ecu.ram)} />
+            <InfoRow label="Supplier" value={displayValue(ecu.supplier)} />
+            <InfoRow label="Power Mode" value={displayValue(ecu.powerMode)} />
           </div>
         </InspectorSection>
 
@@ -97,11 +146,30 @@ export function InspectorPanel() {
 
         <InspectorSection title="Networks">
           <div className="flex flex-wrap gap-1">
-            {ecu.networks.map((n) => (
-              <NetworkBadge key={n} type={n} />
-            ))}
+            {ecu.networks.length > 0 ? (
+              ecu.networks.map((n) => <NetworkBadge key={n} type={n} />)
+            ) : (
+              <span className="text-xs text-slate-500">{NOT_SPECIFIED}</span>
+            )}
           </div>
         </InspectorSection>
+
+        <InspectorSection title="ASIL">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <AsilBadge level={ecu.asil} />
+              <span className="text-xs text-slate-400">ASIL {ecu.asil}</span>
+            </div>
+            <p className="text-[10px] text-slate-500 leading-relaxed">{ASIL_MEANINGS[ecu.asil]}</p>
+          </div>
+        </InspectorSection>
+
+        {ecuExplanation && (
+          <ArchitectureExplainSection
+            key={`ecu:${ecu.id}`}
+            explanation={ecuExplanation}
+          />
+        )}
 
         <InspectorSection title="CAN IDs">
           <div className="flex flex-wrap gap-1">
@@ -207,13 +275,13 @@ function AutosarInspector({ layerId }: { layerId: string }) {
   if (!layer) return null;
 
   return (
-    <aside className="w-72 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
+    <aside className="w-full h-full min-h-0 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
       <div className="p-3 border-b border-cyan-500/10">
         <h2 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">AUTOSAR Layer</h2>
         <h3 className="text-sm font-semibold text-slate-100 mt-1">{layer.name}</h3>
         <p className="text-[10px] font-mono text-cyan-400/70">{layer.shortName}</p>
       </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-3">
         <InspectorSection title="Purpose">
           <p className="text-xs text-slate-400 leading-relaxed">{layer.purpose}</p>
         </InspectorSection>
@@ -269,38 +337,77 @@ function FeatureInspector({ featureId }: { featureId: string }) {
 
   if (!feature) return null;
 
+  const featureExplanation = buildFeatureArchitectureExplanation(feature);
+  const featureAsilLevels = getFeatureAsilLevels(feature);
+  const featurePurpose = getFeaturePurpose(feature);
+
   return (
-    <aside className="w-72 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
+    <aside className="w-full h-full min-h-0 border-l border-cyan-500/10 bg-slate-900/40 flex flex-col">
       <div className="p-3 border-b border-cyan-500/10">
-        <h2 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Feature</h2>
-        <h3 className="text-sm font-semibold text-slate-100 mt-1">{feature.name}</h3>
+        <InspectorKindBadge kind="feature" />
+        <h3 className="text-sm font-semibold text-slate-100 mt-2">{feature.name}</h3>
       </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-3">
         <InspectorSection title="Description">
-          <p className="text-xs text-slate-400 leading-relaxed">{feature.description}</p>
+          <p className="text-xs text-slate-400 leading-relaxed">{displayValue(feature.description)}</p>
+        </InspectorSection>
+        <InspectorSection title="Purpose">
+          <p className="text-xs text-slate-400 leading-relaxed">{featurePurpose}</p>
         </InspectorSection>
         <InspectorSection title="Driver Input">
-          <p className="text-xs text-amber-400/80">{feature.driverInput}</p>
+          <p className="text-xs text-amber-400/80">{displayValue(feature.driverInput)}</p>
         </InspectorSection>
         <InspectorSection title="Physical Output">
-          <p className="text-xs text-emerald-400/80">{feature.physicalOutput}</p>
+          <p className="text-xs text-emerald-400/80">{displayValue(feature.physicalOutput)}</p>
         </InspectorSection>
         <InspectorSection title="Involved ECUs">
           <div className="flex flex-wrap gap-1">
-            {feature.involvedEcus.map((id: string) => (
-              <span key={id} className="text-[10px] px-1.5 py-0.5 bg-slate-800/40 rounded text-slate-400">
-                {id}
-              </span>
-            ))}
+            {feature.involvedEcus.length > 0 ? (
+              feature.involvedEcus.map((id: string) => {
+                const ecu = getEcuById(id);
+                return (
+                  <span key={id} className="text-[10px] px-1.5 py-0.5 bg-slate-800/40 rounded text-slate-400">
+                    {ecu ? ecu.shortName || ecu.name : id}
+                  </span>
+                );
+              })
+            ) : (
+              <span className="text-xs text-slate-500">{NOT_SPECIFIED}</span>
+            )}
           </div>
         </InspectorSection>
         <InspectorSection title="Networks">
           <div className="flex flex-wrap gap-1">
-            {feature.involvedNetworks.map((n: string) => (
-              <NetworkBadge key={n} type={n} />
-            ))}
+            {feature.involvedNetworks.length > 0 ? (
+              feature.involvedNetworks.map((n: string) => <NetworkBadge key={n} type={n} />)
+            ) : (
+              <span className="text-xs text-slate-500">{NOT_SPECIFIED}</span>
+            )}
           </div>
         </InspectorSection>
+        <InspectorSection title="Domain">
+          <p className="text-xs text-slate-400">{DOMAIN_LABELS[feature.domain] ?? feature.domain}</p>
+        </InspectorSection>
+        {featureAsilLevels.length > 0 && (
+          <InspectorSection title="ASIL">
+            <div className="space-y-2">
+              {featureAsilLevels.map((level) => (
+                <div key={level} className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <AsilBadge level={level} />
+                    <span className="text-xs text-slate-400">ASIL {level}</span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 leading-relaxed">{ASIL_MEANINGS[level]}</p>
+                </div>
+              ))}
+            </div>
+          </InspectorSection>
+        )}
+
+        <ArchitectureExplainSection
+          key={`feature:${feature.id}`}
+          explanation={featureExplanation}
+        />
 
         <motion.button
           onClick={() => isSimulationRunning ? stopSimulation() : startSimulation()}

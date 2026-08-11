@@ -1,0 +1,904 @@
+/* Homepage vehicle network architecture — presentation layer only */
+
+.homepage-architecture {
+  --hp-accent: rgba(0, 212, 255, 0.55);
+  --hp-border: rgba(56, 189, 248, 0.16);
+  --hp-panel-bg: rgba(10, 16, 28, 0.92);
+}
+
+.homepage-architecture.engineering-bg {
+  background-color: #070b12;
+}
+
+.homepage-architecture.hp-layout-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+}
+
+.homepage-architecture .hp-layout-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Title ── */
+.homepage-architecture .hp-architecture-title {
+  flex-shrink: 0;
+  padding: 10px 16px 6px;
+  text-align: center;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.08);
+  background: rgba(7, 11, 18, 0.6);
+}
+
+.homepage-architecture .hp-architecture-title-text {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: rgba(186, 230, 253, 0.95);
+  text-transform: uppercase;
+}
+
+.homepage-architecture .hp-architecture-subtitle {
+  margin-top: 2px;
+  font-size: 9px;
+  font-family: ui-monospace, monospace;
+  color: rgba(100, 116, 139, 0.85);
+  letter-spacing: 0.06em;
+}
+
+/* ── Left panel ── */
+.homepage-architecture .hp-left-panel {
+  flex-shrink: 0;
+  width: 168px;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-right: 1px solid rgba(56, 189, 248, 0.08);
+  background: var(--hp-panel-bg);
+  z-index: 12;
+  overflow-y: auto;
+}
+
+.homepage-architecture .hp-panel-heading {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(100, 116, 139, 0.95);
+  margin-bottom: 6px;
+}
+
+.homepage-architecture .hp-network-list,
+.homepage-architecture .hp-asil-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.homepage-architecture .hp-network-list-item {
+  display: grid;
+  grid-template-columns: 8px 1fr auto;
+  gap: 6px;
+  align-items: center;
+  padding: 3px 0;
+}
+
+.homepage-architecture .hp-network-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.homepage-architecture .hp-network-list-name {
+  font-size: 9px;
+  color: rgba(148, 163, 184, 0.9);
+  line-height: 1.25;
+}
+
+.homepage-architecture .hp-network-list-rate {
+  font-size: 8px;
+  font-family: ui-monospace, monospace;
+  color: rgba(71, 85, 105, 0.95);
+}
+
+.homepage-architecture .hp-asil-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  color: rgba(148, 163, 184, 0.88);
+  padding: 3px 0;
+}
+
+.homepage-architecture .hp-asil-swatch {
+  width: 14px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+}
+
+.homepage-architecture .hp-asil-swatch.hp-asil-d {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.45);
+}
+
+.homepage-architecture .hp-asil-swatch.hp-asil-c {
+  background: rgba(251, 146, 60, 0.25);
+  border-color: rgba(251, 146, 60, 0.45);
+}
+
+.homepage-architecture .hp-asil-swatch.hp-asil-b {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.45);
+}
+
+.homepage-architecture .hp-asil-swatch.hp-asil-a,
+.homepage-architecture .hp-asil-swatch.hp-asil-qm {
+  background: rgba(148, 163, 184, 0.2);
+  border-color: rgba(148, 163, 184, 0.35);
+}
+
+/* ── Main canvas area ── */
+.homepage-architecture .hp-canvas-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.homepage-architecture .hp-canvas-wrap .homepage-architecture-flow {
+  width: 100%;
+  height: 100%;
+}
+
+.homepage-architecture .hp-right-panel {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 188px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--hp-border);
+  background: var(--hp-panel-bg);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+  z-index: 25;
+}
+
+.homepage-architecture .hp-right-section + .hp-right-section {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(56, 189, 248, 0.08);
+}
+
+.homepage-architecture .hp-check-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.homepage-architecture .hp-check-list li {
+  display: flex;
+  gap: 6px;
+  font-size: 9px;
+  color: rgba(148, 163, 184, 0.88);
+  line-height: 1.35;
+  padding: 2px 0;
+}
+
+.homepage-architecture .hp-check-icon {
+  color: rgba(52, 211, 153, 0.85);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.homepage-architecture .hp-summary-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.homepage-architecture .hp-summary-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 8px;
+  padding: 2px 0;
+  color: rgba(148, 163, 184, 0.85);
+}
+
+.homepage-architecture .hp-summary-rate {
+  font-family: ui-monospace, monospace;
+  color: rgba(71, 85, 105, 0.95);
+}
+
+.homepage-architecture .hp-side-profile {
+  width: 100%;
+  height: auto;
+  margin-top: 4px;
+}
+
+.homepage-architecture .hp-side-profile-body {
+  fill: rgba(30, 41, 59, 0.5);
+  stroke: rgba(100, 116, 139, 0.35);
+  stroke-width: 1;
+}
+
+.homepage-architecture .hp-side-profile-wheel {
+  fill: rgba(15, 23, 42, 0.8);
+  stroke: rgba(100, 116, 139, 0.4);
+}
+
+.homepage-architecture .hp-side-profile-ecu {
+  fill: rgba(56, 189, 248, 0.6);
+}
+
+.homepage-architecture .hp-ecu-front { fill: #38bdf8; }
+.homepage-architecture .hp-ecu-cabin { fill: #a78bfa; }
+.homepage-architecture .hp-ecu-power { fill: #fbbf24; }
+.homepage-architecture .hp-ecu-chassis { fill: #34d399; }
+
+.homepage-architecture .hp-side-profile-note {
+  margin-top: 4px;
+  font-size: 8px;
+  color: rgba(100, 116, 139, 0.8);
+  font-family: ui-monospace, monospace;
+}
+
+.homepage-architecture .hp-vignette {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: radial-gradient(ellipse 85% 75% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.18) 100%);
+}
+
+/* ── Flow vehicle layer ── */
+.homepage-architecture .hp-vehicle-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1320px;
+  height: 880px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.homepage-architecture .hp-domain-labels-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1320px;
+  height: 880px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.homepage-architecture .hp-domain-label {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  paint-order: stroke fill;
+}
+
+.homepage-architecture .hp-domain-adas { fill: rgba(125, 211, 252, 0.85); }
+.homepage-architecture .hp-domain-central { fill: rgba(251, 191, 36, 0.9); }
+.homepage-architecture .hp-domain-body { fill: rgba(196, 181, 253, 0.85); }
+.homepage-architecture .hp-domain-powertrain { fill: rgba(110, 231, 183, 0.85); }
+.homepage-architecture .hp-domain-chassis { fill: rgba(252, 165, 165, 0.85); }
+
+.homepage-architecture .hp-vehicle-body-fill {
+  fill: rgba(15, 23, 42, 0.35);
+  stroke: none;
+}
+
+.homepage-architecture .hp-vehicle-outline {
+  fill: none;
+  stroke: rgba(100, 116, 139, 0.35);
+  stroke-width: 1.5;
+}
+
+.homepage-architecture .hp-vehicle-glass {
+  fill: rgba(56, 189, 248, 0.04);
+  stroke: rgba(56, 189, 248, 0.12);
+  stroke-width: 1;
+  stroke-dasharray: 4 6;
+}
+
+.homepage-architecture .hp-domain-band { fill: rgba(56, 189, 248, 0.015); }
+.homepage-architecture .hp-domain-band-adas { fill: rgba(56, 189, 248, 0.03); }
+.homepage-architecture .hp-domain-band-cabin { fill: rgba(167, 139, 250, 0.02); }
+.homepage-architecture .hp-domain-band-powertrain { fill: rgba(251, 191, 36, 0.02); }
+.homepage-architecture .hp-domain-band-chassis { fill: rgba(52, 211, 153, 0.02); }
+
+.homepage-architecture .hp-centerline {
+  stroke: rgba(56, 189, 248, 0.1);
+  stroke-width: 1;
+  stroke-dasharray: 4 10;
+}
+
+.homepage-architecture .hp-wheel-arch {
+  fill: rgba(7, 11, 18, 0.7);
+  stroke: rgba(100, 116, 139, 0.25);
+  stroke-width: 1;
+}
+
+.homepage-architecture .hp-wheel-tire {
+  fill: rgba(30, 41, 59, 0.85);
+  stroke: rgba(71, 85, 105, 0.4);
+  stroke-width: 1;
+}
+
+.homepage-architecture .hp-orient-label {
+  font-family: ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-anchor: middle;
+  fill: rgba(148, 163, 184, 0.45);
+  font-weight: 600;
+}
+
+.homepage-architecture .hp-orient-front { fill: rgba(56, 189, 248, 0.55); }
+.homepage-architecture .hp-side-label {
+  font-family: ui-monospace, monospace;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  fill: rgba(100, 116, 139, 0.35);
+  font-weight: 600;
+}
+.homepage-architecture .hp-side-right { text-anchor: end; }
+
+/* ── React Flow layering ── */
+.homepage-architecture .homepage-architecture-flow {
+  z-index: 2;
+}
+
+.homepage-architecture .homepage-architecture-flow .react-flow__edges {
+  z-index: 1;
+}
+
+.homepage-architecture .homepage-architecture-flow .react-flow__nodes {
+  z-index: 2;
+}
+
+.homepage-architecture .homepage-architecture-flow .react-flow__edge-path {
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+
+/* Subtle idle edge pulse — CSS only, no React state loops */
+.homepage-architecture .homepage-architecture-flow:not(.hp-simulation-active) .react-flow__edge:not(.react-flow__edge-animated):not(.hp-trace-edge) .react-flow__edge-path {
+  stroke-dasharray: 6 10;
+  animation: hp-edge-idle 3.5s linear infinite;
+}
+
+@keyframes hp-edge-idle {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+
+/* ── ECU engineering modules ── */
+.homepage-architecture .hp-ecu-module {
+  width: 122px;
+  background: rgba(15, 23, 42, 0.94);
+}
+
+.homepage-architecture .hp-ecu-gateway {
+  width: 138px;
+  border-color: rgba(251, 191, 36, 0.55) !important;
+  box-shadow:
+    0 0 0 1px rgba(251, 191, 36, 0.15),
+    0 6px 20px rgba(0, 0, 0, 0.45) !important;
+}
+
+.homepage-architecture .hp-ecu-module-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 5px 7px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+}
+
+.homepage-architecture .hp-ecu-gateway .hp-ecu-module-header {
+  background: linear-gradient(180deg, rgba(120, 90, 20, 0.35), rgba(15, 23, 42, 0.95));
+  border-bottom-color: rgba(251, 191, 36, 0.25);
+}
+
+.homepage-architecture .hp-ecu-module-header-active {
+  background: linear-gradient(180deg, rgba(0, 212, 255, 0.2), rgba(15, 23, 42, 0.95));
+}
+
+.homepage-architecture .hp-ecu-module-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(241, 245, 249, 0.95);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 72px;
+}
+
+.homepage-architecture .hp-ecu-gateway .hp-ecu-module-title {
+  max-width: 96px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.homepage-architecture .hp-ecu-module-body {
+  padding: 6px 7px 7px;
+}
+
+.homepage-architecture .hp-ecu-module-desc {
+  font-size: 8px;
+  line-height: 1.35;
+  color: rgba(148, 163, 184, 0.85);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.homepage-architecture .hp-ecu-module-networks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.homepage-architecture .hp-ecu-module-autosar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 5px;
+  font-size: 7px;
+  font-family: ui-monospace, monospace;
+  color: rgba(52, 211, 153, 0.75);
+}
+
+.homepage-architecture .hp-ecu-autosar-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(52, 211, 153, 0.85);
+}
+
+/* ── Controls & minimap ── */
+.homepage-architecture .hp-flow-controls.react-flow__controls {
+  background: var(--hp-panel-bg) !important;
+  border: 1px solid var(--hp-border) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.homepage-architecture .hp-flow-controls .react-flow__controls-button {
+  border-bottom-color: rgba(56, 189, 248, 0.08) !important;
+  width: 26px !important;
+  height: 26px !important;
+}
+
+.homepage-architecture .hp-flow-minimap {
+  width: 148px !important;
+  height: 108px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--hp-border) !important;
+  opacity: 0.92;
+}
+
+.homepage-architecture .hp-flow-minimap .react-flow__minimap-mask {
+  fill: rgba(4, 8, 16, 0.75);
+}
+
+.homepage-architecture .hp-fit-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  letter-spacing: 0.04em;
+  color: rgba(148, 163, 184, 0.95);
+  background: var(--hp-panel-bg);
+  border: 1px solid var(--hp-border);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  z-index: 10;
+}
+
+.homepage-architecture .hp-fit-btn:hover {
+  color: #00d4ff;
+  border-color: rgba(0, 212, 255, 0.35);
+}
+
+.homepage-architecture .hp-fit-btn svg {
+  width: 11px;
+  height: 11px;
+}
+
+.homepage-architecture .hp-direction-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  color: rgba(148, 163, 184, 0.7);
+  background: var(--hp-panel-bg);
+  border: 1px solid rgba(56, 189, 248, 0.1);
+  z-index: 10;
+}
+
+.homepage-architecture .hp-direction-pill .hp-arrow {
+  color: rgba(0, 212, 255, 0.55);
+}
+
+@media (max-width: 1280px) {
+  .homepage-architecture .hp-left-panel {
+    width: 148px;
+  }
+
+  .homepage-architecture .hp-right-panel {
+    width: 160px;
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .homepage-architecture .hp-right-panel {
+    display: none;
+  }
+}
+
+/* ── Homepage interaction layer ── */
+.homepage-architecture .hp-interaction-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 6px 12px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.08);
+  background: rgba(7, 11, 18, 0.85);
+  z-index: 12;
+}
+
+.homepage-architecture .hp-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.homepage-architecture .hp-toolbar-label {
+  font-size: 8px;
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  color: rgba(100, 116, 139, 0.9);
+}
+
+.homepage-architecture .hp-toolbar-select {
+  font-size: 9px;
+  font-family: ui-monospace, monospace;
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(56, 189, 248, 0.15);
+  background: rgba(15, 23, 42, 0.9);
+  color: rgba(203, 213, 225, 0.9);
+}
+
+.homepage-architecture .hp-toolbar-btn {
+  font-size: 8px;
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(56, 189, 248, 0.15);
+  background: rgba(15, 23, 42, 0.9);
+  color: rgba(148, 163, 184, 0.9);
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.homepage-architecture .hp-toolbar-btn:hover {
+  color: #7dd3fc;
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.homepage-architecture .hp-toolbar-btn-active {
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.45);
+  background: rgba(56, 189, 248, 0.1);
+}
+
+.homepage-architecture .hp-toolbar-btn-warn {
+  color: rgba(251, 191, 36, 0.9);
+  border-color: rgba(251, 191, 36, 0.35);
+}
+
+.homepage-architecture .hp-ecu-tooltip {
+  position: fixed;
+  z-index: 50;
+  max-width: 200px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: rgba(10, 16, 28, 0.96);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+.homepage-architecture .hp-ecu-tooltip-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(241, 245, 249, 0.95);
+  margin-bottom: 2px;
+}
+
+.homepage-architecture .hp-ecu-tooltip-line {
+  font-size: 8px;
+  color: rgba(148, 163, 184, 0.88);
+  line-height: 1.35;
+}
+
+.homepage-architecture .hp-ecu-tooltip-networks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.homepage-architecture .hp-ecu-tooltip-links {
+  margin-top: 4px;
+  font-family: ui-monospace, monospace;
+  color: rgba(56, 189, 248, 0.75);
+}
+
+.homepage-architecture .hp-trace-panel {
+  position: absolute;
+  bottom: 52px;
+  left: 12px;
+  z-index: 20;
+  max-width: 220px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  background: rgba(10, 16, 28, 0.94);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.homepage-architecture .hp-trace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.homepage-architecture .hp-trace-title {
+  font-size: 8px;
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  color: rgba(125, 211, 252, 0.9);
+}
+
+.homepage-architecture .hp-trace-exit,
+.homepage-architecture .hp-clear-focus {
+  font-size: 8px;
+  font-family: ui-monospace, monospace;
+  color: rgba(251, 191, 36, 0.9);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  background: transparent;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.homepage-architecture .hp-clear-focus {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 22;
+}
+
+.homepage-architecture .hp-trace-hint {
+  font-size: 8px;
+  color: rgba(148, 163, 184, 0.85);
+  margin: 0;
+}
+
+.homepage-architecture .hp-trace-empty {
+  color: rgba(248, 113, 113, 0.85);
+}
+
+.homepage-architecture .hp-trace-path {
+  margin-top: 6px;
+}
+
+.homepage-architecture .hp-trace-step {
+  font-size: 9px;
+  font-family: ui-monospace, monospace;
+  color: rgba(203, 213, 225, 0.9);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.homepage-architecture .hp-trace-arrow {
+  color: rgba(56, 189, 248, 0.6);
+  font-size: 10px;
+}
+
+.homepage-architecture .hp-guided-tour {
+  position: absolute;
+  bottom: 52px;
+  right: 12px;
+  z-index: 22;
+  width: 240px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  background: rgba(10, 16, 28, 0.95);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.homepage-architecture .hp-guided-tour-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.homepage-architecture .hp-guided-tour-step {
+  font-size: 8px;
+  font-family: ui-monospace, monospace;
+  color: rgba(100, 116, 139, 0.9);
+}
+
+.homepage-architecture .hp-guided-tour-exit {
+  font-size: 8px;
+  color: rgba(148, 163, 184, 0.85);
+  background: none;
+  border: none;
+}
+
+.homepage-architecture .hp-guided-tour-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: rgba(186, 230, 253, 0.95);
+  margin: 0 0 4px;
+}
+
+.homepage-architecture .hp-guided-tour-desc {
+  font-size: 8px;
+  color: rgba(148, 163, 184, 0.88);
+  line-height: 1.4;
+  margin: 0 0 8px;
+}
+
+.homepage-architecture .hp-guided-tour-nav {
+  display: flex;
+  gap: 6px;
+}
+
+.homepage-architecture .hp-presentation-panel {
+  margin: 8px;
+}
+
+.homepage-architecture .hp-presentation-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.homepage-architecture .hp-fit-btn-inline {
+  position: static;
+}
+
+.homepage-architecture .homepage-architecture-flow.hp-trace-active .react-flow__edge.hp-trace-edge .react-flow__edge-path {
+  filter: drop-shadow(0 0 4px color-mix(in srgb, currentColor 55%, transparent));
+}
+
+.homepage-architecture .homepage-architecture-flow.hp-trace-active .react-flow__edge.hp-trace-edge path {
+  stroke-linecap: round;
+}
+
+.homepage-architecture .hp-trace-pulse-layer {
+  pointer-events: none;
+}
+
+.homepage-architecture .hp-trace-pulse-dot {
+  filter: drop-shadow(0 0 5px currentColor);
+  opacity: 0.95;
+}
+
+.homepage-architecture .hp-network-list-btn {
+  display: grid;
+  grid-template-columns: 8px 1fr auto auto;
+  gap: 6px;
+  align-items: center;
+  width: 100%;
+  padding: 3px 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.homepage-architecture .hp-network-list-btn:hover {
+  background: rgba(56, 189, 248, 0.06);
+}
+
+.homepage-architecture .hp-network-list-btn-active {
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.homepage-architecture .hp-network-status {
+  font-size: 7px;
+  font-family: ui-monospace, monospace;
+  color: rgba(52, 211, 153, 0.75);
+}
+
+.homepage-architecture .hp-summary-stats {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+}
+
+.homepage-architecture .hp-summary-stats li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: rgba(148, 163, 184, 0.88);
+  padding: 2px 0;
+}
+
+.homepage-architecture .hp-summary-block {
+  margin-top: 6px;
+}
+
+.homepage-architecture .hp-summary-block-title {
+  display: block;
+  font-size: 8px;
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.06em;
+  color: rgba(100, 116, 139, 0.9);
+  margin-bottom: 4px;
+}
+
+.homepage-architecture .hp-summary-mini {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.homepage-architecture .hp-summary-mini li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8px;
+  color: rgba(148, 163, 184, 0.85);
+  padding: 1px 0;
+}
+
+.homepage-architecture .hp-insights-empty {
+  font-size: 8px;
+  color: rgba(100, 116, 139, 0.85);
+  font-family: ui-monospace, monospace;
+}
+
+.homepage-architecture .hp-view-network .react-flow__edge-path {
+  stroke-width: 1.6;
+}
+
+.homepage-architecture .hp-guided-tour-active .hp-vehicle-layer,
+.homepage-architecture .hp-guided-tour-active .hp-domain-labels-layer {
+  opacity: 1;
+}
